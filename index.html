@@ -3,200 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeonhu | Portfolio</title>
+    <title>Yeonhu | Fashion × Biotechnology</title>
     <style>
-        /* Modern CSS Reset & Typography */
+        /* Modern Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         html {
             scroll-behavior: smooth;
         }
 
-        /* Clean Dark Theme with Modern Gradients */
+        /* Earthy Beige Theme */
         body {
-            background-color: #0f172a;
-            color: #f1f5f9;
-            line-height: 1.6;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: #f5f5f0; /* Soft Bone White */
+            color: #4a4a40; /* Deep Taupe */
+            min-height: 100vh;
+            line-height: 1.7;
         }
 
-        /* Hero Section with Indigo-Cyan Gradient */
-        header {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1 {
-            font-size: 4rem;
-            background: linear-gradient(to right, #818cf8, #22d3ee);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            font-weight: 800;
-        }
-
-        .subtitle {
-            font-size: 1.5rem;
-            color: #94a3b8;
-            max-width: 600px;
-        }
-
-        /* Sections Styling */
-        section {
-            padding: 100px 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        h2 {
-            font-size: 2.5rem;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #334155;
-            padding-bottom: 10px;
-            color: #e2e8f0;
-        }
-
-        /* Projects Grid */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid #334155;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px);
-            border-color: #818cf8;
-        }
-
-        .project-card h3 {
-            color: #818cf8;
-            margin-bottom: 15px;
-        }
-
-        /* Skills Tags */
-        .skills-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .skill-tag {
-            background: rgba(129, 140, 248, 0.1);
-            color: #818cf8;
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(129, 140, 248, 0.3);
-            font-weight: 600;
-        }
-
-        /* Contact Section */
-        .contact-info {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #94a3b8;
-        }
-
-        /* Navigation Bar */
+        /* Navigation - Glassmorphism with Beige Tint */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.8);
+            padding: 1.2rem 2rem;
+            background: rgba(245, 245, 240, 0.9);
             backdrop-filter: blur(10px);
             z-index: 1000;
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(210, 200, 180, 0.5);
         }
 
-        nav a {
-            color: #94a3b8;
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #8c7b6c; /* Warm Sandstone */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #7a7a6a;
             text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #bc9c8c; /* Muted Rose Beige */
+        }
+
+        /* Hero Section - Neutral Gradients */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 900;
+            color: #5d5d4d;
+            margin-bottom: 1rem;
+            letter-spacing: -2px;
+        }
+
+        .hero .subtitle {
+            font-size: 1.4rem;
+            color: #bc9c8c;
+            margin-bottom: 1.5rem;
             font-weight: 500;
-            transition: color 0.3s;
         }
 
-        nav a:hover {
-            color: #22d3ee;
+        .hero .tagline {
+            font-size: 1.1rem;
+            color: #8c8c7c;
+            max-width: 650px;
+            margin-bottom: 2rem;
         }
 
-        /* Responsive Design */
+        /* Section Styling */
+        section {
+            padding: 8rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 4rem;
+            text-align: center;
+            color: #5d5d4d;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: #bc9c8c;
+            margin: 1.5rem auto 0;
+            border-radius: 10px;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image-inner {
+            width: 250px;
+            height: 250px;
+            border-radius: 40px; /* Modern Rounded Square */
+            background: #e6e6dc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 20px 20px 60px #d9d9d0, -20px -20px 60px #ffffff;
+        }
+
+        .highlight {
+            color: #bc9c8c;
+            font-weight: 700;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            background: #efeee5;
+            border: 1px solid #dcdbd0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #8c7b6c;
+            margin-top: 1.5rem;
+        }
+
+        /* Projects Grid - Neumorphism Style */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .project-card {
+            background: #fdfdfa;
+            border: 1px solid #efeee5;
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .project-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 30px 60px rgba(140, 123, 108, 0.15);
+        }
+
+        .project-card h3 {
+            color: #5d5d4d;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .tech-tag {
+            padding: 0.4rem 1rem;
+            background: #f5f5f0;
+            border: 1px solid #e0dfd5;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #8c7b6c;
+            font-weight: 600;
+        }
+
+        /* Skills */
+        .skill-card {
+            background: #fdfdfa;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid #efeee5;
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Contact Button */
+        .contact-btn {
+            display: inline-flex;
+            padding: 1.2rem 2.5rem;
+            background: #8c7b6c;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .contact-btn:hover {
+            background: #bc9c8c;
+            transform: scale(1.05);
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #efeee5;
+            color: #8c8c7c;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            .subtitle { font-size: 1.1rem; }
+            .about-content { grid-template-columns: 1fr; text-align: center; }
+            .about-image-inner { margin: 0 auto; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
-
     <nav>
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#skills">Skills</a>
-        <a href="#contact">Contact</a>
+        <div class="logo">Yeonhu</div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
     </nav>
 
-    <header>
+    <header class="hero">
         <h1>Yeonhu</h1>
-        <p class="subtitle">Fashion Design & Integrative Biotechnology student at SKKU</p>
+        <p class="subtitle">Fashion Design × Integrative Biotechnology</p>
+        <p class="tagline">Passionate explorer at the intersection of creative art and life sciences. Solving complex industrial problems through data and visionary leadership.</p>
     </header>
 
     <section id="about">
-        <h2>About Me</h2>
-        <p>I am a passionate student explorer at the intersection of Fashion and Biotechnology. Currently serving as the Secretary-General for the Student Council of the College of Arts, I enjoy solving complex problems through data and creative leadership.</p>
+        <h2 class="section-title">About Me</h2>
+        <div class="about-content">
+            <div class="about-image-inner">👤</div>
+            <div class="about-text">
+                <p>I am a dual-major student at <span class="highlight">Sungkyunkwan University (SKKU)</span>, specializing in <span class="highlight">Fashion Design</span> and <span class="highlight">Integrative Biotechnology</span>.</p>
+                <p>My academic path explores the synergy between aesthetic design and sustainable bio-innovation. I focus on how biotechnology can revolutionize the future of the textile industry.</p>
+                <div class="role-badge">
+                    💼 Secretary-General, College of Arts Student Council
+                </div>
+            </div>
+        </div>
     </section>
 
     <section id="projects">
-        <h2>Projects</h2>
+        <h2 class="section-title">Key Projects</h2>
         <div class="projects-grid">
             <div class="project-card">
                 <h3>Run-Step Dashboard</h3>
-                <p>A skill-level based running course recommendation system built with Streamlit. Focuses on providing tailored workout paths for beginners to advanced runners.</p>
+                <p>A skill-level based running course recommendation system built with Streamlit to enhance personal training experiences.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Streamlit</span>
+                    <span class="tech-tag">UX Design</span>
+                </div>
             </div>
             <div class="project-card">
-                <h3>Project Hail Mary Data Hub</h3>
-                <p>A Streamlit-based web dashboard for analyzing sci-fi movie data, integrating GitHub data for deep insights into cinematic trends.</p>
+                <h3>Hail Mary Data Hub</h3>
+                <p>An interactive data hub for analyzing sci-fi movie trends and cinematic patterns through Streamlit visualizations.</p>
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span class="tech-tag">Data Vis</span>
+                    <span class="tech-tag">Python</span>
+                    <span class="tech-tag">Analysis</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="skills">
-        <h2>Skills</h2>
-        <div class="skills-container">
-            <span class="skill-tag">Python</span>
-            <span class="skill-tag">Streamlit</span>
-            <span class="skill-tag">Data Analysis</span>
-            <span class="skill-tag">Fashion Production</span>
-            <span class="skill-tag">Strategic Planning</span>
+    <section id="skills" style="text-align: center;">
+        <h2 class="section-title">Core Expertise</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem;">
+            <div class="skill-card"><span class="skill-icon">🐍</span><h4>Python</h4></div>
+            <div class="skill-card"><span class="skill-icon">📊</span><h4>Streamlit</h4></div>
+            <div class="skill-card"><span class="skill-icon">📈</span><h4>Data Analysis</h4></div>
+            <div class="skill-card"><span class="skill-icon">👗</span><h4>Fashion Prod.</h4></div>
+            <div class="skill-card"><span class="skill-icon">🎯</span><h4>Strategy</h4></div>
         </div>
     </section>
 
-    <section id="contact">
-        <h2>Contact</h2>
-        <div class="contact-info">
-            <p>Ready to collaborate on the future of Fashion & Tech.</p>
-            <p style="margin-top: 20px; color: #818cf8;">Sungkyunkwan University, Seoul</p>
-        </div>
+    <section id="contact" style="text-align: center;">
+        <h2 class="section-title">Connect</h2>
+        <p style="margin-bottom: 2.5rem; color: #8c8c7c;">Ready to discuss the future of bio-business and sustainable fashion?</p>
+        <a href="mailto:your-email@skku.edu" class="contact-btn">Get In Touch</a>
     </section>
 
+    <footer>
+        <p>© 2026 Yeonhu. Crafted for Excellence at SKKU.</p>
+    </footer>
 </body>
 </html>
