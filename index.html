@@ -3,669 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeonhu (沇后) | Fashion × Biotechnology</title>
+    <title>Yeonhu | Portfolio</title>
     <style>
+        /* Modern CSS Reset & Typography */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         html {
             scroll-behavior: smooth;
         }
 
+        /* Clean Dark Theme with Modern Gradients */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d0d2b 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
+            background-color: #0f172a;
+            color: #f1f5f9;
             line-height: 1.6;
         }
 
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1rem 2rem;
-            background: rgba(10, 10, 26, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(138, 100, 255, 0.2);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #8a64ff, #64b5ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #b0b0c0;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: #8a64ff;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #8a64ff, #64b5ff);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .hero {
-            min-height: 100vh;
+        /* Hero Section with Indigo-Cyan Gradient */
+        header {
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
             text-align: center;
-            padding: 2rem;
-            position: relative;
-            overflow: hidden;
+            padding: 20px;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(138, 100, 255, 0.15) 0%, transparent 70%);
-            top: 20%;
-            left: 10%;
-            animation: float 8s ease-in-out infinite;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(100, 181, 255, 0.1) 0%, transparent 70%);
-            bottom: 20%;
-            right: 10%;
-            animation: float 6s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(5deg); }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
+        h1 {
             font-size: 4rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #8a64ff 50%, #64b5ff 100%);
+            background: linear-gradient(to right, #818cf8, #22d3ee);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 800;
         }
 
-        .hero .subtitle {
+        .subtitle {
             font-size: 1.5rem;
-            color: #8a8aaa;
-            margin-bottom: 1rem;
-        }
-
-        .hero .tagline {
-            font-size: 1.1rem;
-            color: #64b5ff;
+            color: #94a3b8;
             max-width: 600px;
-            margin-bottom: 2rem;
         }
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            animation: bounce 2s infinite;
-        }
-
-        .scroll-indicator span {
-            display: block;
-            width: 30px;
-            height: 50px;
-            border: 2px solid rgba(138, 100, 255, 0.5);
-            border-radius: 25px;
-            position: relative;
-        }
-
-        .scroll-indicator span::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: #8a64ff;
-            border-radius: 50%;
-            animation: scroll 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(10px); }
-        }
-
-        @keyframes scroll {
-            0% { opacity: 1; top: 8px; }
-            100% { opacity: 0; top: 30px; }
-        }
-
+        /* Sections Styling */
         section {
-            padding: 6rem 2rem;
-            max-width: 1200px;
+            padding: 100px 20px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
-        .section-title {
+        h2 {
             font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            text-align: center;
-            position: relative;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 10px;
+            color: #e2e8f0;
         }
 
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, #8a64ff, #64b5ff);
-            margin: 1rem auto 0;
-            border-radius: 2px;
-        }
-
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-image {
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8a64ff, #64b5ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .about-image::before {
-            content: '';
-            position: absolute;
-            inset: -10px;
-            border-radius: 50%;
-            border: 2px dashed rgba(138, 100, 255, 0.3);
-            animation: spin 20s linear infinite;
-        }
-
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
-
-        .about-image-inner {
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a1a3a, #0d0d2b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-        }
-
-        .about-text p {
-            margin-bottom: 1.5rem;
-            font-size: 1.1rem;
-            color: #c0c0d0;
-        }
-
-        .about-text .highlight {
-            color: #8a64ff;
-            font-weight: 600;
-        }
-
-        .role-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: linear-gradient(135deg, rgba(138, 100, 255, 0.2), rgba(100, 181, 255, 0.2));
-            border: 1px solid rgba(138, 100, 255, 0.3);
-            border-radius: 25px;
-            font-size: 0.9rem;
-            color: #64b5ff;
-            margin-top: 1rem;
-        }
-
+        /* Projects Grid */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
         .project-card {
-            background: linear-gradient(135deg, rgba(26, 26, 58, 0.8), rgba(13, 13, 43, 0.8));
-            border: 1px solid rgba(138, 100, 255, 0.2);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #8a64ff, #64b5ff);
-            transform: scaleX(0);
-            transition: transform 0.3s ease;
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #334155;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
 
         .project-card:hover {
             transform: translateY(-10px);
-            border-color: rgba(138, 100, 255, 0.5);
-            box-shadow: 0 20px 40px rgba(138, 100, 255, 0.2);
-        }
-
-        .project-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .project-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #8a64ff, #64b5ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+            border-color: #818cf8;
         }
 
         .project-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-            color: #ffffff;
+            color: #818cf8;
+            margin-bottom: 15px;
         }
 
-        .project-card p {
-            color: #a0a0b0;
-            margin-bottom: 1.5rem;
-        }
-
-        .tech-stack {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .tech-tag {
-            padding: 0.3rem 0.8rem;
-            background: rgba(138, 100, 255, 0.15);
-            border-radius: 15px;
-            font-size: 0.85rem;
-            color: #8a64ff;
-        }
-
+        /* Skills Tags */
         .skills-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .skill-card {
-            background: linear-gradient(135deg, rgba(26, 26, 58, 0.6), rgba(13, 13, 43, 0.6));
-            border: 1px solid rgba(138, 100, 255, 0.15);
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .skill-card:hover {
-            border-color: rgba(138, 100, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .skill-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(138, 100, 255, 0.2), rgba(100, 181, 255, 0.2));
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-        }
-
-        .skill-card h4 {
-            color: #ffffff;
-            margin-bottom: 0.5rem;
-        }
-
-        .skill-card p {
-            font-size: 0.9rem;
-            color: #8a8aaa;
-        }
-
-        .contact-content {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .contact-content p {
-            font-size: 1.2rem;
-            color: #a0a0b0;
-            margin-bottom: 2rem;
-        }
-
-        .contact-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
             flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .contact-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 2rem;
-            background: linear-gradient(135deg, #8a64ff, #64b5ff);
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 30px;
+        .skill-tag {
+            background: rgba(129, 140, 248, 0.1);
+            color: #818cf8;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(129, 140, 248, 0.3);
             font-weight: 600;
-            transition: all 0.3s ease;
         }
 
-        .contact-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(138, 100, 255, 0.4);
-        }
-
-        .contact-btn.secondary {
-            background: transparent;
-            border: 2px solid #8a64ff;
-        }
-
-        .contact-btn.secondary:hover {
-            background: rgba(138, 100, 255, 0.1);
-        }
-
-        footer {
+        /* Contact Section */
+        .contact-info {
             text-align: center;
-            padding: 2rem;
-            border-top: 1px solid rgba(138, 100, 255, 0.2);
-            color: #6a6a8a;
+            font-size: 1.2rem;
+            color: #94a3b8;
         }
 
-        .mobile-menu {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
+        /* Navigation Bar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
         }
 
-        .mobile-menu span {
-            width: 25px;
-            height: 3px;
-            background: #8a64ff;
-            border-radius: 2px;
+        nav a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
         }
 
+        nav a:hover {
+            color: #22d3ee;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .mobile-menu {
-                display: flex;
-            }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: rgba(10, 10, 26, 0.98);
-                flex-direction: column;
-                padding: 1rem 2rem;
-                gap: 1rem;
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero .subtitle {
-                font-size: 1.2rem;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .about-image {
-                width: 200px;
-                height: 200px;
-            }
-
-            .about-image-inner {
-                width: 180px;
-                height: 180px;
-                font-size: 3.5rem;
-            }
-
-            .projects-grid {
-                grid-template-columns: 1fr;
-            }
-
-            section {
-                padding: 4rem 1.5rem;
-            }
+            h1 { font-size: 2.5rem; }
+            .subtitle { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
+
     <nav>
-        <div class="logo">沇后</div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#about">About</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-        <div class="mobile-menu" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
     </nav>
 
-    <header class="hero">
-        <div class="hero-content">
-            <h1>Yeonhu (沇后)</h1>
-            <p class="subtitle">Fashion Design × Integrative Biotechnology</p>
-            <p class="tagline">Passionate student explorer at the intersection of Fashion and Biotechnology, solving complex problems through data and creative leadership.</p>
-        </div>
-        <div class="scroll-indicator">
-            <span></span>
-        </div>
+    <header>
+        <h1>Yeonhu</h1>
+        <p class="subtitle">Fashion Design & Integrative Biotechnology student at SKKU</p>
     </header>
 
     <section id="about">
-        <h2 class="section-title">About Me</h2>
-        <div class="about-content">
-            <div class="about-image">
-                <div class="about-image-inner">👤</div>
-            </div>
-            <div class="about-text">
-                <p>
-                    I'm <span class="highlight">Yeonhu</span>, a dual-major student at <span class="highlight">Sungkyunkwan University (SKKU)</span>, 
-                    pursuing both <span class="highlight">Fashion Design</span> and <span class="highlight">Integrative Biotechnology</span>.
-                </p>
-                <p>
-                    My unique academic path allows me to explore the fascinating convergence of art and science, 
-                    where creativity meets cutting-edge technology. I believe the future of fashion lies in 
-                    sustainable innovation driven by biotechnology.
-                </p>
-                <p>
-                    Beyond academics, I'm deeply committed to student leadership and community building, 
-                    channeling my passion for strategic planning and data-driven decision making into meaningful impact.
-                </p>
-                <div class="role-badge">
-                    🎓 Secretary-General, Student Council of the College of Arts
-                </div>
-            </div>
-        </div>
+        <h2>About Me</h2>
+        <p>I am a passionate student explorer at the intersection of Fashion and Biotechnology. Currently serving as the Secretary-General for the Student Council of the College of Arts, I enjoy solving complex problems through data and creative leadership.</p>
     </section>
 
     <section id="projects">
-        <h2 class="section-title">Projects</h2>
+        <h2>Projects</h2>
         <div class="projects-grid">
             <div class="project-card">
-                <div class="project-icon">🏃</div>
-                <h3>Running Course Dashboard</h3>
-                <p>
-                    A skill-level based running course recommendation system that helps runners find 
-                    the perfect routes based on their experience and preferences. Built with an intuitive 
-                    interface for seamless user experience.
-                </p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Python</span>
-                    <span class="tech-tag">Streamlit</span>
-                    <span class="tech-tag">Data Analysis</span>
-                </div>
+                <h3>Run-Step Dashboard</h3>
+                <p>A skill-level based running course recommendation system built with Streamlit. Focuses on providing tailored workout paths for beginners to advanced runners.</p>
             </div>
             <div class="project-card">
-                <div class="project-icon">🚀</div>
                 <h3>Project Hail Mary Data Hub</h3>
-                <p>
-                    A comprehensive web dashboard for analyzing sci-fi movie data, featuring interactive 
-                    visualizations and insights. Explore trends, ratings, and patterns in the world of 
-                    science fiction cinema.
-                </p>
-                <div class="tech-stack">
-                    <span class="tech-tag">Python</span>
-                    <span class="tech-tag">Streamlit</span>
-                    <span class="tech-tag">Data Visualization</span>
-                </div>
+                <p>A Streamlit-based web dashboard for analyzing sci-fi movie data, integrating GitHub data for deep insights into cinematic trends.</p>
             </div>
         </div>
     </section>
 
     <section id="skills">
-        <h2 class="section-title">Skills</h2>
+        <h2>Skills</h2>
         <div class="skills-container">
-            <div class="skill-card">
-                <div class="skill-icon">🐍</div>
-                <h4>Python</h4>
-                <p>Data processing & automation</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">📊</div>
-                <h4>Streamlit</h4>
-                <p>Interactive web applications</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">📈</div>
-                <h4>Data Analysis</h4>
-                <p>Insights & visualization</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">👗</div>
-                <h4>Fashion Production</h4>
-                <p>Design to manufacturing</p>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon">🎯</div>
-                <h4>Strategic Planning</h4>
-                <p>Leadership & organization</p>
-            </div>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Streamlit</span>
+            <span class="skill-tag">Data Analysis</span>
+            <span class="skill-tag">Fashion Production</span>
+            <span class="skill-tag">Strategic Planning</span>
         </div>
     </section>
 
     <section id="contact">
-        <h2 class="section-title">Get In Touch</h2>
-        <div class="contact-content">
-            <p>
-                Interested in collaborating on projects at the intersection of fashion and technology? 
-                I'd love to hear from you!
-            </p>
-            <div class="contact-links">
-                <a href="mailto:hello@yeonhu.com" class="contact-btn">
-                    ✉️ Email Me
-                </a>
-                <a href="[linkedin.com](https://linkedin.com)" class="contact-btn secondary" target="_blank">
-                    💼 LinkedIn
-                </a>
-                <a href="[github.com](https://github.com)" class="contact-btn secondary" target="_blank">
-                    🐙 GitHub
-                </a>
-            </div>
+        <h2>Contact</h2>
+        <div class="contact-info">
+            <p>Ready to collaborate on the future of Fashion & Tech.</p>
+            <p style="margin-top: 20px; color: #818cf8;">Sungkyunkwan University, Seoul</p>
         </div>
     </section>
 
-    <footer>
-        <p>© 2025 Yeonhu (沇后). Crafted with passion at SKKU.</p>
-    </footer>
-
-    <script>
-        function toggleMenu() {
-            document.getElementById('navLinks').classList.toggle('active');
-        }
-
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.remove('active');
-            });
-        });
-    </script>
 </body>
 </html>
