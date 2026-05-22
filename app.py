@@ -10,12 +10,25 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for Ivory Background & Clean Design
+# Custom CSS: Fixed hidden text bugs for radio buttons, warnings, and success blocks
 st.markdown("""
     <style>
     .stApp {
         background-color: #FDFBF7;
         color: #2D2A26;
+    }
+    /* Enforce clear black/dark-grey text color for input labels and text strings */
+    .stMarkdown, p, label, .stSelectbox, .stRadio {
+        color: #2D2A26 !important;
+    }
+    /* Fix radio button text visibility */
+    div[data-testid="stRadio"] label p {
+        color: #2D2A26 !important;
+        font-weight: 500;
+    }
+    /* Fix warning block and success block inner typography visibility */
+    .stAlert p {
+        color: #2D2A26 !important;
     }
     div.stButton > button:first-child {
         background-color: #2D2A26;
@@ -96,11 +109,12 @@ def load_course_data():
 
 df = load_course_data()
 
-# Custom Route Generator
+# Custom Route Generator with distinct color-coding rules based on difficulty level
 def get_custom_route(center_lat, center_lng, course_idx):
     points = []
-    shape_factor_x = 0.0012 if course_idx % 2 == 0 else 0.0008
-    shape_factor_y = 0.0015 if course_idx % 3 == 0 else 0.0018
+    # Dynamic shape variations based on index parameters
+    shape_factor_x = 0.0014 if course_idx % 2 == 0 else 0.0009
+    shape_factor_y = 0.0016 if course_idx % 3 == 0 else 0.0019
     
     for i in range(21):
         if i < 6:
@@ -116,12 +130,13 @@ def get_custom_route(center_lat, center_lng, course_idx):
             lat = center_lat
             lng = center_lng + ((20 - i) * shape_factor_y)
             
-        if course_idx in [0, 1, 2]:
-            color = "#06D6A0" if i not in [7, 8] else "#FFD166"
-        elif course_idx in [3, 4, 5]:
-            color = "#FFD166" if i in [3, 4, 11, 12] else ("#E25B3C" if i in [7, 8] else "#06D6A0")
-        else:
-            color = "#E25B3C" if i in [2, 3, 4, 10, 11, 12, 13] else "#FFD166"
+        # Complete overhaul of elevation colors to highlight clear track variations
+        if course_idx in [0, 1, 2]:    # Beginner tracks -> 95% purely Flat Green
+            color = "#06D6A0" if i != 10 else "#FFD166"
+        elif course_idx in [3, 4, 5]:  # Intermediate tracks -> Balanced distribution of Green and Yellow, minimal Red
+            color = "#E25B3C" if i in [8, 9] else ("#FFD166" if i in [4, 5, 12, 13] else "#06D6A0")
+        else:                          # Advanced tracks -> Predominantly Steep Red and Challenging Yellow segments
+            color = "#E25B3C" if i in [2, 3, 4, 5, 8, 9, 12, 13, 14, 15] else "#FFD166"
             
         points.append({"coord": [lat, lng], "color": color})
     return points
@@ -191,13 +206,10 @@ else:
     tabs = st.tabs(tab_names)
     
     def render_course_tab(course_row, internal_idx):
-        # Optimized width ratio [1.3, 1] to prevent text layout clipping on smaller displays
         col_text, col_map = st.columns([1.3, 1])
         
         with col_text:
             st.markdown(f"#### 🏷️ {course_row['Course_Name']}")
-            
-            # Formatted key metrics with ample spacing
             st.markdown(f"**📏 Total Distance:** {course_row['Distance_KM']} km")
             st.markdown(f"**⛰️ Elevation & Incline:** {course_row['Elevation_Desc']}")
             st.markdown(" ")
@@ -234,7 +246,6 @@ else:
                 icon=folium.Icon(color="black", icon="play", prefix="fa")
             ).add_to(m)
             
-            # Adjusted dimensions for robust cross-device visual rendering
             st_folium(m, width=520, height=380, key=f"map_id_{internal_idx}")
 
     for i, (orig_idx, row) in enumerate(filtered_df.iterrows()):
@@ -242,4 +253,4 @@ else:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v4.2 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
+    st.caption("Run-Step Dashboard v5.0 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
