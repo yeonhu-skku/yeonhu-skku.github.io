@@ -10,25 +10,12 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS: Fixed hidden text bugs for radio buttons, warnings, and success blocks
+# Custom CSS for Ivory Background & Clean Design
 st.markdown("""
     <style>
     .stApp {
         background-color: #FDFBF7;
         color: #2D2A26;
-    }
-    /* Enforce clear black/dark-grey text color for input labels and text strings */
-    .stMarkdown, p, label, .stSelectbox, .stRadio {
-        color: #2D2A26 !important;
-    }
-    /* Fix radio button text visibility */
-    div[data-testid="stRadio"] label p {
-        color: #2D2A26 !important;
-        font-weight: 500;
-    }
-    /* Fix warning block and success block inner typography visibility */
-    .stAlert p {
-        color: #2D2A26 !important;
     }
     div.stButton > button:first-child {
         background-color: #2D2A26;
@@ -51,7 +38,7 @@ if "diagnosed" not in st.session_state:
 if "user_level" not in st.session_state:
     st.session_state.user_level = "Beginner"
 
-# 3. Dataset Setup with Geographic Coordinates & Formal English Content
+# 3. Dataset Setup with Geographic Coordinates, Nearby Places & Artistically Tailored Playlists
 @st.cache_data
 def load_course_data():
     data = {
@@ -103,16 +90,43 @@ def load_course_data():
             "Refuel after a hard trail run with a healthy salad bowl in Seochon or explore traditional street food at the historic Tongin Market.",
             "Offers wide panoramic views of the Han River, making it highly convenient for quick convenience store refueling and public transit access.",
             "Unwind at a historic coffee establishment frequented by local cyclists and runners after conquering the legendary steep hills."
+        ],
+        # Playlist Setup tailored to your favorite artist inputs
+        "Playlist_Title": [
+            "Chill & Gentle Breeze Pop (Featuring Lauv & LANY)", "Smooth & Emotional Jogging Melodies (Featuring Troye Sivan & LANY)", "Light Acoustic Warm-Up Beats (Featuring Lauv)",
+            "Rhythmic Mid-Tempo Run (Featuring Charlie Puth & Ed Sheeran)", "Groovy Electro-Pop Strides (Featuring Charlie Puth & Sam Smith)", "Steady-Paced Cardio Anthems (Featuring Ed Sheeran & Sam Smith)",
+            "High-Octane K-Pop & Global Hip-Hop (Featuring BTS & BLACKPINK)", "Extreme Adrenaline Heavy Beats (Featuring Global Hip-Hop & BLACKPINK)", "Ultimate Limit Breaker Playlist (Featuring BTS & Heavy Rap Hits)"
+        ],
+        "Playlist_Desc": [
+            "A collection of relaxing, synth-pop tracks with smooth melodies. Perfect for clearing your mind and maintaining a comfortable rhythm along the river breeze.",
+            "A stylish selection of trendy, emotional pop anthems that synchronize beautifully with a peaceful sunset or night view.",
+            "Warm, easy-listening acoustic and indie pop vibes designed to keep your heart rate steady and your mind relaxed.",
+            "Packed with infectious, groovy rhythms and high-energy vocals to help you naturally build a cheerful, steady cadence.",
+            "Sophisticated, bass-driven pop beats explicitly curated to lock you into a consistent running flow without fatigue.",
+            "Dynamic mid-tempo radio hits engineered to help you conquer undulating paths with an optimistic and continuous stride.",
+            "Features explosive choruses, powerful raps, and intense EDM drops from top global artists to pump maximum adrenaline into your mountain run.",
+            "Relentless, heavy-hitting global rap and hard-hitting basslines designed to maintain focus and drive during long endurance challenges.",
+            "Unleash your full athletic potential with high-tempo, aggressive tracks curated to help you conquer the steepest inclines."
+        ],
+        "Playlist_Link": [
+            "https://www.youtube.com/results?search_query=lauv+lany+running+playlist",
+            "https://www.youtube.com/results?search_query=lany+troye+sivan+running+playlist",
+            "https://www.youtube.com/results?search_query=lauv+chill+running+playlist",
+            "https://www.youtube.com/results?search_query=charlie+puth+ed+sheeran+running",
+            "https://www.youtube.com/results?search_query=charlie+puth+sam+smith+playlist",
+            "https://www.youtube.com/results?search_query=ed+sheeran+sam+smith+running",
+            "https://www.youtube.com/results?search_query=bts+blackpink+running+playlist",
+            "https://www.youtube.com/results?search_query=global+hiphop+blackpink+workout",
+            "https://www.youtube.com/results?search_query=bts+heavy+rap+workout"
         ]
     }
     return pd.DataFrame(data)
 
 df = load_course_data()
 
-# Custom Route Generator with distinct color-coding rules based on difficulty level
+# Custom Route Generator
 def get_custom_route(center_lat, center_lng, course_idx):
     points = []
-    # Dynamic shape variations based on index parameters
     shape_factor_x = 0.0014 if course_idx % 2 == 0 else 0.0009
     shape_factor_y = 0.0016 if course_idx % 3 == 0 else 0.0019
     
@@ -130,12 +144,11 @@ def get_custom_route(center_lat, center_lng, course_idx):
             lat = center_lat
             lng = center_lng + ((20 - i) * shape_factor_y)
             
-        # Complete overhaul of elevation colors to highlight clear track variations
-        if course_idx in [0, 1, 2]:    # Beginner tracks -> 95% purely Flat Green
+        if course_idx in [0, 1, 2]:
             color = "#06D6A0" if i != 10 else "#FFD166"
-        elif course_idx in [3, 4, 5]:  # Intermediate tracks -> Balanced distribution of Green and Yellow, minimal Red
+        elif course_idx in [3, 4, 5]:
             color = "#E25B3C" if i in [8, 9] else ("#FFD166" if i in [4, 5, 12, 13] else "#06D6A0")
-        else:                          # Advanced tracks -> Predominantly Steep Red and Challenging Yellow segments
+        else:
             color = "#E25B3C" if i in [2, 3, 4, 5, 8, 9, 12, 13, 14, 15] else "#FFD166"
             
         points.append({"coord": [lat, lng], "color": color})
@@ -221,6 +234,11 @@ else:
             st.markdown(f"##### ☕ Nearby Attraction: **{course_row['Places_Title']}**")
             st.info(f"{course_row['Places_Desc']}")
             
+            st.markdown("---")
+            st.markdown(f"##### 🎵 Recommended Playlist: **{course_row['Playlist_Title']}**")
+            st.write(f"*{course_row['Playlist_Desc']}*")
+            st.link_button("🎧 Open Playlist on YouTube", course_row['Playlist_Link'])
+            
         with col_map:
             st.markdown("**🗺️ Route Elevation Visualizer**")
             st.caption("🟢 Green: Flat Terrain | 🟡 Yellow: Moderate Incline | 🔴 Red: Steep Incline Section")
@@ -253,4 +271,4 @@ else:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v5.0 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
+    st.caption("Run-Step Dashboard v5.2 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
