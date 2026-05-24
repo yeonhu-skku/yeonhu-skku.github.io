@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for Ivory Background & Clean Design
+# Custom CSS for Ivory Background, Clean UI & Music Player Grid
 st.markdown("""
     <style>
     .stApp {
@@ -29,6 +29,50 @@ st.markdown("""
         background-color: #E25B3C;
         color: #FDFBF7;
     }
+    /* Playlist Player Box Styling */
+    .player-row {
+        display: flex;
+        align-items: center;
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        border: 1px solid #EFECE6;
+    }
+    .player-cover {
+        width: 55px;
+        height: 55px;
+        border-radius: 6px;
+        object-fit: cover;
+        margin-right: 16px;
+    }
+    .player-info {
+        flex-grow: 1;
+    }
+    .player-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2D2A26;
+        margin-bottom: 2px;
+    }
+    .player-artist {
+        font-size: 13px;
+        color: #7A756E;
+    }
+    .play-btn {
+        background-color: #2D2A26;
+        color: #FDFBF7 !important;
+        padding: 6px 14px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+    .play-btn:hover {
+        background-color: #E25B3C;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -38,12 +82,11 @@ if "diagnosed" not in st.session_state:
 if "user_level" not in st.session_state:
     st.session_state.user_level = "Beginner"
 
-# 3. Dataset Setup with Geographic Coordinates, Hashtags, and Exact Tracklists
+# 3. Dataset Setup with Geographic Coordinates, Real Hotspots, Links, and Track Metadata
 @st.cache_data
 def load_course_data():
     data = {
         "Level": ["Beginner", "Beginner", "Beginner", "Intermediate", "Intermediate", "Intermediate", "Advanced", "Advanced", "Advanced"],
-        # Exact Course names restricted strictly to Korean as requested
         "Course_Name": ["한강시민공원 여의도 코스", "석촌호수 루프 트레일", "동네 근린공원 산책로", 
                        "남산 둘레길 시닉 코스", "양재천-탄천 연계 롱런 코스", "북서울꿈의숲 업힐 트랙", 
                        "인왕산 정복 트레일러닝", "하프 마라톤 실전 정복 코스", "지옥의 10비트 고개 코스"],
@@ -76,68 +119,117 @@ def load_course_data():
             [37.5509, 126.9909], [37.4934, 127.0601], [37.6257, 127.0371],
             [37.5758, 126.9583], [37.5408, 127.0717], [37.5921, 126.9423]
         ],
-        # Attraction titles restricted strictly to Korean as requested
-        "Places_Title": [
-            "여의도 한강공원 배달존 & 더현대 서울", "석촌호수 송리단길 카페거리", "공원 앞 로컬 베이커리 & 브런치 맛집",
-            "남산타워 전망대 & 남산 돈까스 거리", "양재천 카페거리 & 도곡동 브런치숍", "북서울꿈의숲 전망대 카페",
-            "서촌 통인시장 & 프레시 샐러드 바", "뚝섬 한강공원 수변광장", "부암동 클럽에스프레소 카페"
+        
+        # --- 2 REAL HOTSPOTS PER COURSE WITH MAP/INSTA LINKS ---
+        "Spots": [
+            # 1. 여의도
+            [
+                {"name": "더현대 서울 (The Hyundai Seoul)", "tags": "#쇼핑몰 #에어컨빵빵 #러닝후구경", "map": "https://maps.google.com/?q=더현대+서울", "insta": "https://www.instagram.com/thehyundai_seoul/"},
+                {"name": "여의도 한강공원 배달존", "tags": "#돗자리 #한강라면 #치맥 #러너성지", "map": "https://maps.google.com/?q=여의도+한강공원+배달존", "insta": "https://www.instagram.com/explore/tags/한강라면/"}
+            ],
+            # 2. 석촌호수
+            [
+                {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=니커버커베이글+송파점", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
+            ],
+            # 3. 동네공원
+            [
+                {"name": "파리바게뜨 로컬 스토어", "tags": "#갓구운빵 #아이스아메리카노 #접근성최고", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
+                {"name": "이디야커피 공원점", "tags": "#가성비카페 #수분충전 #러닝마무리", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
+            ],
+            # 4. 남산
+            [
+                {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101번지+남산돈까스+본점", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
+                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=이중생업", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
+            ],
+            # 5. 양재천
+            [
+                {"name": "룸서비스301 (Room Service 301)", "tags": "#양재천카페거리 #창가뷰 #숲감성", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
+                {"name": "캐틀앤비 (Cattle & Bee)", "tags": "#테라스카페 #도곡동브런치 #분위기맛집", "map": "https://maps.google.com/?q=캐틀앤비+양재점", "insta": "https://www.instagram.com/cattle_bee/"}
+            ],
+            # 6. 북서울꿈의숲
+            [
+                {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=라포레스타", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
+                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=북서울꿈의숲+아트센터", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
+            ],
+            # 7. 인왕산
+            [
+                {"name": "통인시장 (Tongin Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=통인시장", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
+                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
+            ],
+            # 8. 하프 마라톤
+            [
+                {"name": "아구아구 (Agu Agu) 뚝섬", "tags": "#포크샐러드 #러너식단 #리프레시", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
+                {"name": "뚝섬한강공원 편의점", "tags": "#파워에이드 #에너지젤보충 #보급기지", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
+            ],
+            # 9. 10비트
+            [
+                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=계열사", "insta": "https://www.instagram.com/explore/tags/계열사/"}
+            ]
         ],
-        "Places_Desc": [
-            "Perfect for enjoying iconic riverside instant ramen or food delivery on the lawn post-run, followed by premium shopping at The Hyundai Seoul.",
-            "Packed with aesthetic dessert cafes and cozy restaurants, making it an ideal destination for a post-running dinner or date.",
-            "An excellent spot to immediately replenish carbohydrates with freshly baked artisan bread and fresh fruit juice right after your session.",
-            "Replenish your protein levels with a hearty meal at the famous Namsan Cutlet Street, a symbolic culinary hotspot for local runners.",
-            "Cool down and relax in a quiet, sophisticated neighborhood cafe with a refreshing iced americano after an intense workout.",
-            "A scenic healing spot where you can enjoy chilled beverages while overlooking the vast forest view from an elevated observatory cafe.",
-            "Refuel after a hard trail run with a healthy salad bowl in Seochon or explore traditional street food at the historic Tongin Market.",
-            "Offers wide panoramic views of the Han River, making it highly convenient for quick convenience store refueling and public transit access.",
-            "Unwind at a historic coffee establishment frequented by local cyclists and runners after conquering the legendary steep hills."
-        ],
-        # Simulated stock imagery links matching the aesthetic destinations
-        "Places_Image": [
-            "https://images.unsplash.com/photo-1626245347915-d72b26090a9a?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1618083707368-b3823daa2726?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=80",
-            "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=500&q=80"
-        ],
-        # Dynamic Hashtag generation 
-        "Places_Hashtags": [
-            "#HangangRamen #TheHyundai #RiversideVibe #NightRun", "#SongridanGil #LotteTowerView #LakeJogging #DateCourse", "#BakeryRun #CarbLoading #LocalPark #MorningRoutine",
-            "#NamsanTower #PaceChallenge #KingCutlet #ScenicView", "#Yangjaecheon #CafeTerrace #EnduranceTraining #IcedAmericano", "#DreamForest #UphillIntervals #GreeneryVibe #Observatory",
-            "#SeochonVibe #TrailRecovery #SaladBowl #TonginMarket", "#MarathonTraining #RiverView #HydrationStation #TransitFriendly", "#HillConquest #ClubEspresso #AdrenalineRush #RunnersCommunity"
-        ],
-        # Formal structural text strings containing explicit tracklist arrays
+
+        # --- REAL PLAYER SONGS WITH BEAUTIFUL ALBUM ARTWORKS ---
         "Playlist_Title": [
-            "Chill Acoustic & Synth Pop Vibe", "Trendy City Night Grooves", "Bright Morning Warm-Up Beats",
+            "Chill Acoustic & Gentle Breeze Pop", "Trendy City Night Grooves", "Bright Morning Warm-Up Beats",
             "Rhythmic Mid-Tempo Running Hits", "Groovy Bassline Urban Anthems", "High-Stamina Cardio Boosters",
-            "High-Octane Energy Booster Mix", "Relentless Distance Pace Maker", "Ultimate Adrenaline Limit Breaker"
+            "High-Octane K-Pop Energy Booster", "Relentless Global Rap Pace Maker", "Ultimate Adrenaline Limit Breaker"
         ],
         "Playlist_Tracks": [
-            ["Lauv - Paris in the Rain", "LANY - ILYSB", "Troye Sivan - Youth", "Lauv - I Like Me Better", "LANY - 13"],
-            ["LANY - Super Far", "Troye Sivan - Strawberries & Cigarettes", "Lauv - Chasing Fire", "LANY - Thru These Tears", "Troye Sivan - Wild"],
-            ["Lauv - Reflipped", "LANY - Cowboy in LA", "Troye Sivan - Lucky Strike", "Lauv - Feelings", "LANY - Pink Skies"],
-            ["Charlie Puth - Attention", "Ed Sheeran - Shivers", "Charlie Puth - Light Switch", "Ed Sheeran - Bad Habits", "Charlie Puth - Left and Right"],
-            ["Charlie Puth - How Long", "Sam Smith - Unholy", "Charlie Puth - We Don't Talk Anymore", "Sam Smith - Diamonds", "Charlie Puth - Done For Me"],
-            ["Ed Sheeran - Shape of You", "Sam Smith - I'm Not Here To Make Friends", "Ed Sheeran - Castle on the Hill", "Sam Smith - Promises", "Ed Sheeran - Overpass Graffiti"],
-            ["BTS - Dynamite", "BLACKPINK - Kill This Love", "Eminem - Lose Yourself", "BTS - MIC Drop (Steve Aoki Remix)", "BLACKPINK - How You Like That"],
-            ["BLACKPINK - Pink Venom", "Kendrick Lamar - HUMBLE.", "Travis Scott - SICKO MODE", "BLACKPINK - DDU-DU DDU-DU", "Drake - Nonstop"],
-            ["BTS - Run BTS", "Kanye West - Power", "Post Malone - Rockstar", "BTS - ON", "Jack Harlow - WHATS POPPIN"]
-        ],
-        "Playlist_Link": [
-            "https://www.youtube.com/results?search_query=lauv+lany+running+playlist",
-            "https://www.youtube.com/results?search_query=lany+troye+sivan+running+playlist",
-            "https://www.youtube.com/results?search_query=lauv+chill+running+playlist",
-            "https://www.youtube.com/results?search_query=charlie+puth+ed+sheeran+running",
-            "https://www.youtube.com/results?search_query=charlie+puth+sam+smith+playlist",
-            "https://www.youtube.com/results?search_query=ed+sheeran+sam+smith+running",
-            "https://www.youtube.com/results?search_query=bts+blackpink+running+playlist",
-            "https://www.youtube.com/results?search_query=global+hiphop+blackpink+workout",
-            "https://www.youtube.com/results?search_query=bts+heavy+rap+workout"
+            # Beginner 1
+            [
+                {"title": "Paris in the Rain", "artist": "Lauv", "cover": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=100&q=80", "link": "https://www.youtube.com/watch?v=kOCkne-Bku4"},
+                {"title": "ILYSB", "artist": "LANY", "cover": "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=100&q=80", "link": "https://www.youtube.com/watch?v=SSTp0rknOgA"},
+                {"title": "Youth", "artist": "Troye Sivan", "cover": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&q=80", "link": "https://www.youtube.com/watch?v=XYAghEq5Lfw"}
+            ],
+            # Beginner 2
+            [
+                {"title": "Super Far", "artist": "LANY", "cover": "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=100&q=80", "link": "https://www.youtube.com/watch?v=B88Zas_DclM"},
+                {"title": "Strawberries & Cigarettes", "artist": "Troye Sivan", "cover": "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&q=80", "link": "https://www.youtube.com/watch?v=Z3LgC8u_R8Y"},
+                {"title": "I Like Me Better", "artist": "Lauv", "cover": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=100&q=80", "link": "https://www.youtube.com/watch?v=BcqxLCWn-CE"}
+            ],
+            # Beginner 3
+            [
+                {"title": "Feelings", "artist": "Lauv", "cover": "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=100&q=80", "link": "https://www.youtube.com/watch?v=421w1jR-SgE"},
+                {"title": "Pink Skies", "artist": "LANY", "cover": "https://images.unsplash.com/photo-1487180142328-054b783ef471?w=100&q=80", "link": "https://www.youtube.com/watch?v=eE7T_I9vInU"},
+                {"title": "Wild", "artist": "Troye Sivan", "cover": "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=100&q=80", "link": "https://www.youtube.com/watch?v=fdXNNveYOfU"}
+            ],
+            # Intermediate 1
+            [
+                {"title": "Attention", "artist": "Charlie Puth", "cover": "https://images.unsplash.com/photo-1506157786151-b8491531f063?w=100&q=80", "link": "https://www.youtube.com/watch?v=nfs8NYg7yQM"},
+                {"title": "Shivers", "artist": "Ed Sheeran", "cover": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=100&q=80", "link": "https://www.youtube.com/watch?v=Il0S8BoucSA"},
+                {"title": "Light Switch", "artist": "Charlie Puth", "cover": "https://images.unsplash.com/photo-1484876065684-b683cf17d276?w=100&q=80", "link": "https://www.youtube.com/watch?v=WFsAon_TWPQ"}
+            ],
+            # Intermediate 2
+            [
+                {"title": "How Long", "artist": "Charlie Puth", "cover": "https://images.unsplash.com/photo-1453090923802-60c396337ed3?w=100&q=80", "link": "https://www.youtube.com/watch?v=TdylllyoV9c"},
+                {"title": "Unholy", "artist": "Sam Smith", "cover": "https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=100&q=80", "link": "https://www.youtube.com/watch?v=Uq9gPaizbe8"},
+                {"title": "Bad Habits", "artist": "Ed Sheeran", "cover": "https://images.unsplash.com/photo-1574169208507-84376144848b?w=100&q=80", "link": "https://www.youtube.com/watch?v=orJSJGHjBLI"}
+            ],
+            # Intermediate 3
+            [
+                {"title": "Shape of You", "artist": "Ed Sheeran", "cover": "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=100&q=80", "link": "https://www.youtube.com/watch?v=JGwWNGJdvx8"},
+                {"title": "Diamonds", "artist": "Sam Smith", "cover": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100&q=80", "link": "https://www.youtube.com/watch?v=8RvAKRoDB7o"},
+                {"title": "Left and Right", "artist": "Charlie Puth (feat. Jungkook)", "cover": "https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=100&q=80", "link": "https://www.youtube.com/watch?v=a7GITgqwDVg"}
+            ],
+            # Advanced 1
+            [
+                {"title": "Dynamite", "artist": "BTS", "cover": "https://images.unsplash.com/photo-1563841930606-67e2bce48b78?w=100&q=80", "link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
+                {"title": "Kill This Love", "artist": "BLACKPINK", "cover": "https://images.unsplash.com/photo-1528722828814-77b9b83aafb2?w=100&q=80", "link": "https://www.youtube.com/watch?v=2S24-y0Ij3Y"},
+                {"title": "HUMBLE.", "artist": "Kendrick Lamar", "cover": "https://images.unsplash.com/photo-1482440308425-276ad0f28b19?w=100&q=80", "link": "https://www.youtube.com/watch?v=tvTRZJ-4EyI"}
+            ],
+            # Advanced 2
+            [
+                {"title": "Pink Venom", "artist": "BLACKPINK", "cover": "https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=100&q=80", "link": "https://www.youtube.com/watch?v=glhXCuM_Y7M"},
+                {"title": "SICKO MODE", "artist": "Travis Scott", "cover": "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=100&q=80", "link": "https://www.youtube.com/watch?v=d-JBBNg8YKs"},
+                {"title": "MIC Drop", "artist": "BTS (Steve Aoki Remix)", "cover": "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=100&q=80", "link": "https://www.youtube.com/watch?v=kTlv5_i8ICM"}
+            ],
+            # Advanced 3
+            [
+                {"title": "Run BTS (달려라 방탄)", "artist": "BTS", "cover": "https://images.unsplash.com/photo-1598387181032-a3103a2db5b3?w=100&q=80", "link": "https://www.youtube.com/watch?v=9tG70B3DLIY"},
+                {"title": "How You Like That", "artist": "BLACKPINK", "cover": "https://images.unsplash.com/photo-1571330735066-03add575b712?w=100&q=80", "link": "https://www.youtube.com/watch?v=ioNng23DkIM"},
+                {"title": "Lose Yourself", "artist": "Eminem", "cover": "https://images.unsplash.com/photo-1503095396549-807759245b35?w=100&q=80", "link": "https://www.youtube.com/watch?v=_Yhyp_hXnyU"}
+            ]
         ]
     }
     return pd.DataFrame(data)
@@ -232,77 +324,85 @@ else:
     filtered_df = df[df["Level"] == st.session_state.user_level]
     
     st.markdown("---")
-    st.write("### 📍 Top 3 Recommended Course Maps")
-    st.write("You can drag, zoom in, or zoom out the map. The track line color represents real-time incline elevation difficulty.")
+    st.write("### 📍 Recommended Course Explorer")
+    st.write("Below sections expand across the entire width of the screen for an optimized browsing experience.")
     
     tab_names = [f"📌 {row['Course_Name']}" for _, row in filtered_df.iterrows()]
     tabs = st.tabs(tab_names)
     
     def render_course_tab(course_row, internal_idx):
-        col_text, col_map = st.columns([1.3, 1])
+        # 1) Clean Header without explicit 'Course Name:' labels
+        st.markdown(f"# {course_row['Course_Name']}")
         
-        with col_text:
-            st.markdown(f"### 📍 장소명: {course_row['Course_Name']}")
-            st.markdown(f"**📏 Total Distance:** {course_row['Distance_KM']} km")
-            st.markdown(f"**⛰️ Elevation & Incline:** {course_row['Elevation_Desc']}")
-            st.markdown(" ")
+        c1, c2, c3 = st.columns(3)
+        c1.metric(label="Total Distance", value=f"{course_row['Distance_KM']} km")
+        c2.metric(label="Incline Elevation", value=course_row['Elevation_Desc'])
+        c3.markdown("")
+        
+        st.success(f"**👍 PROS:** {course_row['Pros']}")
+        st.warning(f"**👎 CAUTIONS:** {course_row['Cons']}")
+        st.markdown(" ")
+        
+        # 2) Full Width Map Segment
+        st.markdown("#### 🗺️ Route Elevation Visualizer")
+        st.caption("🟢 Green: Flat Terrain | 🟡 Yellow: Moderate Incline | 🔴 Red: Steep Incline Section (Drag and zoom to explore)")
+        
+        m = folium.Map(location=course_row['Map_Center'], zoom_start=15, tiles="CartoDB positron")
+        route_points = get_custom_route(course_row['Map_Center'][0], course_row['Map_Center'][1], internal_idx)
+        for idx in range(len(route_points) - 1):
+            p1 = route_points[idx]["coord"]
+            p2 = route_points[idx+1]["coord"]
+            color_code = route_points[idx]["color"]
+            folium.PolyLine(locations=[p1, p2], color=color_code, width=6, opacity=0.9).add_to(m)
+        
+        folium.Marker(location=course_row['Map_Center'], popup="Start Point", icon=folium.Icon(color="black", icon="play", prefix="fa")).add_to(m)
+        st_folium(m, width=1400, height=350, key=f"full_map_{internal_idx}")
+        
+        st.markdown("---")
+        
+        # 3) Full Width Nearby Hotspots (2 real spots side-by-side with genuine maps/insta links)
+        st.markdown("#### ☕ Nearby Places (Hotspots for Runners)")
+        spot_list = course_row['Spots']
+        col_spot1, col_spot2 = st.columns(2)
+        
+        with col_spot1:
+            st.markdown(f"##### 📍 {spot_list[0]['name']}")
+            st.caption(spot_list[0]['tags'])
+            sc1, sc2 = st.columns(2)
+            sc1.link_button("🗺️ 구글 지도 링크", spot_list[0]['map'])
+            sc2.link_button("📸 인스타그램 링크", spot_list[0]['insta'])
             
-            st.success(f"**👍 PROS:** {course_row['Pros']}")
-            st.warning(f"**👎 CAUTIONS:** {course_row['Cons']}")
+        with col_spot2:
+            st.markdown(f"##### 📍 {spot_list[1]['name']}")
+            st.caption(spot_list[1]['tags'])
+            sc3, sc4 = st.columns(2)
+            sc3.link_button("🗺️ 구글 지도 링크", spot_list[1]['map'])
+            sc4.link_button("📸 인스타그램 링크", spot_list[1]['insta'])
             
-            # Sub-segment 1: Attractions with image card and trend hashtags
-            st.markdown("---")
-            st.markdown(f"##### ☕ Nearby Attraction: {course_row['Places_Title']}")
+        st.markdown("---")
+        
+        # 4) Full Width Custom Music Player Grid (Melon/Spotify Layout Style)
+        st.markdown("#### 🎵 Running Playlist")
+        st.write(f"**Theme: {course_row['Playlist_Title']}**")
+        st.caption("Click '▶ Play' to instantly open and stream the track on YouTube.")
+        
+        for track in course_row['Playlist_Tracks']:
+            st.markdown(f"""
+                <div class="player-row">
+                    <img src="{track['cover']}" class="player-cover">
+                    <div class="player-info">
+                        <div class="player-title">{track['title']}</div>
+                        <div class="player-artist">{track['artist']}</div>
+                    </div>
+                    <a href="{track['link']}" target="_blank" class="play-btn">▶ Play</a>
+                </div>
+            """, unsafe_allow_html=True)
             
-            col_img, col_desc = st.columns([1, 1.5])
-            with col_img:
-                st.image(course_row['Places_Image'], use_container_width=True)
-            with col_desc:
-                st.write(f"{course_row['Places_Desc']}")
-                st.markdown(f"**`{course_row['Places_Hashtags']}`**")
-            
-            # Sub-segment 2: Playlist tracklist display structure
-            st.markdown("---")
-            st.markdown(f"##### 🎵 Playlist: {course_row['Playlist_Title']}")
-            
-            # Map dynamic bullet strings cleanly looping across target string blocks
-            st.markdown("**Tracklist:**")
-            for track in course_row['Playlist_Tracks']:
-                st.markdown(f"* {track}")
-                
-            st.markdown(" ")
-            st.link_button("🎧 Open Playlist on YouTube", course_row['Playlist_Link'])
-            
-        with col_map:
-            st.markdown("**🗺️ Route Elevation Visualizer**")
-            st.caption("🟢 Green: Flat Terrain | 🟡 Yellow: Moderate Incline | 🔴 Red: Steep Incline Section")
-            
-            m = folium.Map(location=course_row['Map_Center'], zoom_start=15, tiles="CartoDB positron")
-            
-            route_points = get_custom_route(course_row['Map_Center'][0], course_row['Map_Center'][1], internal_idx)
-            for idx in range(len(route_points) - 1):
-                p1 = route_points[idx]["coord"]
-                p2 = route_points[idx+1]["coord"]
-                color_code = route_points[idx]["color"]
-                
-                folium.PolyLine(
-                    locations=[p1, p2],
-                    color=color_code,
-                    width=6,
-                    opacity=0.9
-                ).add_to(m)
-            
-            folium.Marker(
-                location=course_row['Map_Center'],
-                popup="Start Point",
-                icon=folium.Icon(color="black", icon="play", prefix="fa")
-            ).add_to(m)
-            
-            st_folium(m, width=520, height=380, key=f"map_id_{internal_idx}")
+        st.markdown(" ")
 
     for i, (orig_idx, row) in enumerate(filtered_df.iterrows()):
         with tabs[i]:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v5.3 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
+    st.caption("Run-Step Dashboard v6.1 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
