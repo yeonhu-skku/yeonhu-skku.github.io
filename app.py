@@ -38,14 +38,15 @@ if "diagnosed" not in st.session_state:
 if "user_level" not in st.session_state:
     st.session_state.user_level = "Beginner"
 
-# 3. Dataset Setup with Geographic Coordinates, Nearby Places & Artistically Tailored Playlists
+# 3. Dataset Setup with Geographic Coordinates, Hashtags, and Exact Tracklists
 @st.cache_data
 def load_course_data():
     data = {
         "Level": ["Beginner", "Beginner", "Beginner", "Intermediate", "Intermediate", "Intermediate", "Advanced", "Advanced", "Advanced"],
-        "Course_Name": ["Yeouido Hangang Park Trail", "Seokchon Lake Loop", "Neighborhood Green Park Trail", 
-                       "Namsan Perimeter Scenic Course", "Yangjaecheon-Tancheon Link Long-Run", "North Seoul Dream Forest Uphill Track", 
-                       "Mt. Inwangsan Conquest Trail", "Half-Marathon Simulation Course", "10-Beat Hell Hill Course"],
+        # Exact Course names restricted strictly to Korean as requested
+        "Course_Name": ["한강시민공원 여의도 코스", "석촌호수 루프 트레일", "동네 근린공원 산책로", 
+                       "남산 둘레길 시닉 코스", "양재천-탄천 연계 롱런 코스", "북서울꿈의숲 업힐 트랙", 
+                       "인왕산 정복 트레일러닝", "하프 마라톤 실전 정복 코스", "지옥의 10비트 고개 코스"],
         "Distance_KM": [3.0, 2.5, 2.0, 7.0, 8.5, 5.0, 12.0, 21.0, 15.0],
         "Elevation_Desc": ["Flat (Very Low)", "Flat (Low)", "Flat (Low)", "Sloped (Medium)", "Moderate (Medium)", "Steep (Medium-High)", "Rugged (High)", "Varied (High)", "Very Steep (Extreme)"],
         "Pros": [
@@ -75,10 +76,11 @@ def load_course_data():
             [37.5509, 126.9909], [37.4934, 127.0601], [37.6257, 127.0371],
             [37.5758, 126.9583], [37.5408, 127.0717], [37.5921, 126.9423]
         ],
+        # Attraction titles restricted strictly to Korean as requested
         "Places_Title": [
-            "Yeouido Hangang Food Zone & The Hyundai Seoul", "Songridan-gil Cafe Street", "Local Bakery & Brunch Spots",
-            "Namsan Tower Observatory & Cutlet Street", "Yangjaecheon Cafe Street & Dogok Brunch Shops", "Dream Forest Observatory Café",
-            "Seochon Tongin Market & Fresh Salad Bars", "Ttukseom Park Riverside Plaza", "Buam-dong Club Espresso"
+            "여의도 한강공원 배달존 & 더현대 서울", "석촌호수 송리단길 카페거리", "공원 앞 로컬 베이커리 & 브런치 맛집",
+            "남산타워 전망대 & 남산 돈까스 거리", "양재천 카페거리 & 도곡동 브런치숍", "북서울꿈의숲 전망대 카페",
+            "서촌 통인시장 & 프레시 샐러드 바", "뚝섬 한강공원 수변광장", "부암동 클럽에스프레소 카페"
         ],
         "Places_Desc": [
             "Perfect for enjoying iconic riverside instant ramen or food delivery on the lawn post-run, followed by premium shopping at The Hyundai Seoul.",
@@ -91,22 +93,40 @@ def load_course_data():
             "Offers wide panoramic views of the Han River, making it highly convenient for quick convenience store refueling and public transit access.",
             "Unwind at a historic coffee establishment frequented by local cyclists and runners after conquering the legendary steep hills."
         ],
-        # Playlist Setup tailored to your favorite artist inputs
-        "Playlist_Title": [
-            "Chill & Gentle Breeze Pop (Featuring Lauv & LANY)", "Smooth & Emotional Jogging Melodies (Featuring Troye Sivan & LANY)", "Light Acoustic Warm-Up Beats (Featuring Lauv)",
-            "Rhythmic Mid-Tempo Run (Featuring Charlie Puth & Ed Sheeran)", "Groovy Electro-Pop Strides (Featuring Charlie Puth & Sam Smith)", "Steady-Paced Cardio Anthems (Featuring Ed Sheeran & Sam Smith)",
-            "High-Octane K-Pop & Global Hip-Hop (Featuring BTS & BLACKPINK)", "Extreme Adrenaline Heavy Beats (Featuring Global Hip-Hop & BLACKPINK)", "Ultimate Limit Breaker Playlist (Featuring BTS & Heavy Rap Hits)"
+        # Simulated stock imagery links matching the aesthetic destinations
+        "Places_Image": [
+            "https://images.unsplash.com/photo-1626245347915-d72b26090a9a?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1618083707368-b3823daa2726?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=500&q=80",
+            "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=500&q=80"
         ],
-        "Playlist_Desc": [
-            "A collection of relaxing, synth-pop tracks with smooth melodies. Perfect for clearing your mind and maintaining a comfortable rhythm along the river breeze.",
-            "A stylish selection of trendy, emotional pop anthems that synchronize beautifully with a peaceful sunset or night view.",
-            "Warm, easy-listening acoustic and indie pop vibes designed to keep your heart rate steady and your mind relaxed.",
-            "Packed with infectious, groovy rhythms and high-energy vocals to help you naturally build a cheerful, steady cadence.",
-            "Sophisticated, bass-driven pop beats explicitly curated to lock you into a consistent running flow without fatigue.",
-            "Dynamic mid-tempo radio hits engineered to help you conquer undulating paths with an optimistic and continuous stride.",
-            "Features explosive choruses, powerful raps, and intense EDM drops from top global artists to pump maximum adrenaline into your mountain run.",
-            "Relentless, heavy-hitting global rap and hard-hitting basslines designed to maintain focus and drive during long endurance challenges.",
-            "Unleash your full athletic potential with high-tempo, aggressive tracks curated to help you conquer the steepest inclines."
+        # Dynamic Hashtag generation 
+        "Places_Hashtags": [
+            "#HangangRamen #TheHyundai #RiversideVibe #NightRun", "#SongridanGil #LotteTowerView #LakeJogging #DateCourse", "#BakeryRun #CarbLoading #LocalPark #MorningRoutine",
+            "#NamsanTower #PaceChallenge #KingCutlet #ScenicView", "#Yangjaecheon #CafeTerrace #EnduranceTraining #IcedAmericano", "#DreamForest #UphillIntervals #GreeneryVibe #Observatory",
+            "#SeochonVibe #TrailRecovery #SaladBowl #TonginMarket", "#MarathonTraining #RiverView #HydrationStation #TransitFriendly", "#HillConquest #ClubEspresso #AdrenalineRush #RunnersCommunity"
+        ],
+        # Formal structural text strings containing explicit tracklist arrays
+        "Playlist_Title": [
+            "Chill Acoustic & Synth Pop Vibe", "Trendy City Night Grooves", "Bright Morning Warm-Up Beats",
+            "Rhythmic Mid-Tempo Running Hits", "Groovy Bassline Urban Anthems", "High-Stamina Cardio Boosters",
+            "High-Octane Energy Booster Mix", "Relentless Distance Pace Maker", "Ultimate Adrenaline Limit Breaker"
+        ],
+        "Playlist_Tracks": [
+            ["Lauv - Paris in the Rain", "LANY - ILYSB", "Troye Sivan - Youth", "Lauv - I Like Me Better", "LANY - 13"],
+            ["LANY - Super Far", "Troye Sivan - Strawberries & Cigarettes", "Lauv - Chasing Fire", "LANY - Thru These Tears", "Troye Sivan - Wild"],
+            ["Lauv - Reflipped", "LANY - Cowboy in LA", "Troye Sivan - Lucky Strike", "Lauv - Feelings", "LANY - Pink Skies"],
+            ["Charlie Puth - Attention", "Ed Sheeran - Shivers", "Charlie Puth - Light Switch", "Ed Sheeran - Bad Habits", "Charlie Puth - Left and Right"],
+            ["Charlie Puth - How Long", "Sam Smith - Unholy", "Charlie Puth - We Don't Talk Anymore", "Sam Smith - Diamonds", "Charlie Puth - Done For Me"],
+            ["Ed Sheeran - Shape of You", "Sam Smith - I'm Not Here To Make Friends", "Ed Sheeran - Castle on the Hill", "Sam Smith - Promises", "Ed Sheeran - Overpass Graffiti"],
+            ["BTS - Dynamite", "BLACKPINK - Kill This Love", "Eminem - Lose Yourself", "BTS - MIC Drop (Steve Aoki Remix)", "BLACKPINK - How You Like That"],
+            ["BLACKPINK - Pink Venom", "Kendrick Lamar - HUMBLE.", "Travis Scott - SICKO MODE", "BLACKPINK - DDU-DU DDU-DU", "Drake - Nonstop"],
+            ["BTS - Run BTS", "Kanye West - Power", "Post Malone - Rockstar", "BTS - ON", "Jack Harlow - WHATS POPPIN"]
         ],
         "Playlist_Link": [
             "https://www.youtube.com/results?search_query=lauv+lany+running+playlist",
@@ -222,7 +242,7 @@ else:
         col_text, col_map = st.columns([1.3, 1])
         
         with col_text:
-            st.markdown(f"#### 🏷️ {course_row['Course_Name']}")
+            st.markdown(f"### 📍 장소명: {course_row['Course_Name']}")
             st.markdown(f"**📏 Total Distance:** {course_row['Distance_KM']} km")
             st.markdown(f"**⛰️ Elevation & Incline:** {course_row['Elevation_Desc']}")
             st.markdown(" ")
@@ -230,13 +250,27 @@ else:
             st.success(f"**👍 PROS:** {course_row['Pros']}")
             st.warning(f"**👎 CAUTIONS:** {course_row['Cons']}")
             
+            # Sub-segment 1: Attractions with image card and trend hashtags
             st.markdown("---")
-            st.markdown(f"##### ☕ Nearby Attraction: **{course_row['Places_Title']}**")
-            st.info(f"{course_row['Places_Desc']}")
+            st.markdown(f"##### ☕ Nearby Attraction: {course_row['Places_Title']}")
             
+            col_img, col_desc = st.columns([1, 1.5])
+            with col_img:
+                st.image(course_row['Places_Image'], use_container_width=True)
+            with col_desc:
+                st.write(f"{course_row['Places_Desc']}")
+                st.markdown(f"**`{course_row['Places_Hashtags']}`**")
+            
+            # Sub-segment 2: Playlist tracklist display structure
             st.markdown("---")
-            st.markdown(f"##### 🎵 Recommended Playlist: **{course_row['Playlist_Title']}**")
-            st.write(f"*{course_row['Playlist_Desc']}*")
+            st.markdown(f"##### 🎵 Playlist: {course_row['Playlist_Title']}")
+            
+            # Map dynamic bullet strings cleanly looping across target string blocks
+            st.markdown("**Tracklist:**")
+            for track in course_row['Playlist_Tracks']:
+                st.markdown(f"* {track}")
+                
+            st.markdown(" ")
             st.link_button("🎧 Open Playlist on YouTube", course_row['Playlist_Link'])
             
         with col_map:
@@ -271,4 +305,4 @@ else:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v5.2 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
+    st.caption("Run-Step Dashboard v5.3 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
