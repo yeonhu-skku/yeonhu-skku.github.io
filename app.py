@@ -17,7 +17,7 @@ st.set_page_config(
 # Premium Minimal CSS Theme - Fully Inspired by Apple iOS & Apple Fitness Aesthetics
 st.markdown("""
 <style>
-    /* Global Reset & Base (Apple System Native Fonts) */
+    /* Global Reset & Base */
     .stApp {
         background: linear-gradient(180deg, #FAFAFC 0%, #F5F5F7 100%);
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
@@ -75,7 +75,7 @@ st.markdown("""
             0 4px 12px rgba(0, 0, 0, 0.02);
     }
     
-    /* Metric Display (Apple Dashboard Style) */
+    /* Metric Display */
     .metric-container {
         background: #FFFFFF;
         border: 1px solid rgba(0, 0, 0, 0.06);
@@ -104,13 +104,13 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
     
-    /* Accent Metric (Apple Fitness Activity Orange Accent) */
+    /* Accent Metric */
     .metric-accent {
         background: #1D1D1F;
         border: none;
     }
     .metric-accent .metric-value {
-        color: #FF453A; /* Apple Activity Ring Scarlet Red */
+        color: #FF453A;
     }
     .metric-accent .metric-label {
         color: rgba(255, 255, 255, 0.5);
@@ -145,19 +145,19 @@ st.markdown("""
         letter-spacing: -0.01em;
     }
     .level-beginner {
-        background: rgba(52, 199, 89, 0.15); /* Apple Green */
+        background: rgba(52, 199, 89, 0.15);
         color: #248A3D;
     }
     .level-intermediate {
-        background: rgba(255, 149, 0, 0.15); /* Apple Orange */
+        background: rgba(255, 149, 0, 0.15);
         color: #C27200;
     }
     .level-advanced {
-        background: rgba(255, 59, 48, 0.15); /* Apple Red */
+        background: rgba(255, 59, 48, 0.15);
         color: #D32F2F;
     }
     
-    /* Apple Music Style Player Card Component */
+    /* Apple Music Style Player Card */
     .player-card {
         display: flex;
         align-items: center;
@@ -177,8 +177,8 @@ st.markdown("""
     .player-artwork {
         width: 52px;
         height: 52px;
-        background: linear-gradient(135deg, #FF2D55 0%, #FA243C 100%); /* Apple Music Signature Crimson */
-        border-radius: 50%; /* Rounded circular token inspired by Apple Music UI */
+        background: linear-gradient(135deg, #FF2D55 0%, #FA243C 100%);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -221,34 +221,64 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(250,36,60,0.3);
     }
     
-    /* Apple Maps Style Spot Card */
+    /* Apple Maps Style Spot Card & Unified Link layout fixing spacer gap bugs */
     .spot-card {
         background: #FFFFFF;
-        border-radius: 16px;
+        border-radius: 18px;
         padding: 24px;
         border: 1px solid rgba(0, 0, 0, 0.06);
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.01);
         transition: all 0.3s ease;
     }
     .spot-card:hover {
-        border-color: #007AFF; /* Apple Maps System Blue Tint */
+        border-color: #007AFF;
         box-shadow: 0 8px 30px rgba(0, 122, 255, 0.06);
     }
+    .spot-header-group {
+        margin-bottom: 20px;
+    }
     .spot-name {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 600;
         color: #1D1D1F;
-        margin-bottom: 12px;
+        margin-bottom: 4px;
         letter-spacing: -0.01em;
     }
     .spot-tags {
-        font-size: 0.8rem;
+        font-size: 0.825rem;
         color: #86868B;
         line-height: 1.5;
-        margin-bottom: 16px;
+        margin-top: 8px;
+    }
+    .spot-action-container {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+    }
+    .spot-link-btn {
+        flex: 1;
+        text-align: center;
+        background: transparent;
+        color: #007AFF !important;
+        border: 1px solid rgba(0, 122, 255, 0.2);
+        border-radius: 20px;
+        padding: 10px 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 0.2s ease;
+    }
+    .spot-link-btn:hover {
+        border-color: #007AFF;
+        background: #007AFF;
+        color: #FFFFFF !important;
     }
     
-    /* Custom Streamlit Buttons (Apple System Accent Style) */
+    /* Custom Streamlit Buttons */
     .stButton > button {
         background: #1D1D1F !important;
         color: #FFFFFF !important;
@@ -262,29 +292,12 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
     .stButton > button:hover {
-        background: #007AFF !important; /* Apple Vivid Blue */
+        background: #007AFF !important;
         transform: translateY(-1px) !important;
         box-shadow: 0 6px 20px rgba(0, 122, 255, 0.25) !important;
     }
     
-    /* Link Buttons (Apple Bordered Button Theme) */
-    .stLinkButton > a {
-        background: transparent !important;
-        color: #007AFF !important;
-        border: 1px solid rgba(0, 122, 255, 0.2) !important;
-        border-radius: 24px !important;
-        padding: 10px 20px !important;
-        font-weight: 600 !important;
-        font-size: 0.85rem !important;
-        transition: all 0.2s ease !important;
-    }
-    .stLinkButton > a:hover {
-        border-color: #007AFF !important;
-        background: #007AFF !important;
-        color: #FFFFFF !important;
-    }
-    
-    /* Tabs Styling (Apple Segmented Control Style) */
+    /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
         background: rgba(120, 120, 128, 0.08) !important;
@@ -309,12 +322,8 @@ st.markdown("""
         color: #1D1D1F !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
-    .stTabs [data-baseweb="tab-highlight"] {
-        display: none;
-    }
-    .stTabs [data-baseweb="tab-border"] {
-        display: none;
-    }
+    .stTabs [data-baseweb="tab-highlight"] { display: none; }
+    .stTabs [data-baseweb="tab-border"] { display: none; }
     
     /* Select Box */
     .stSelectbox [data-baseweb="select"] {
@@ -322,14 +331,10 @@ st.markdown("""
         border-radius: 12px;
         border: 1px solid rgba(0, 0, 0, 0.15);
     }
-    .stSelectbox [data-baseweb="select"]:focus-within {
-        border-color: #007AFF;
-    }
+    .stSelectbox [data-baseweb="select"]:focus-within { border-color: #007AFF; }
     
     /* Radio Buttons */
-    .stRadio > div {
-        gap: 12px;
-    }
+    .stRadio > div { gap: 12px; }
     .stRadio label {
         background: #FFFFFF;
         padding: 16px 20px;
@@ -338,9 +343,7 @@ st.markdown("""
         transition: all 0.2s ease;
         cursor: pointer;
     }
-    .stRadio label:hover {
-        border-color: rgba(0,0,0,0.25);
-    }
+    .stRadio label:hover { border-color: rgba(0,0,0,0.25); }
     
     /* Divider */
     .custom-divider {
@@ -383,7 +386,7 @@ st.markdown("""
         margin-bottom: 24px;
     }
     
-    /* Weather Widget (Apple Weather Dynamic Gradient Vibe) */
+    /* Weather Widget */
     .weather-widget {
         background: linear-gradient(145deg, #5AC8FA 0%, #007AFF 100%);
         border-radius: 16px;
@@ -394,15 +397,8 @@ st.markdown("""
         gap: 16px;
         box-shadow: 0 4px 15px rgba(0,122,255,0.15);
     }
-    .weather-temp {
-        font-size: 2.5rem;
-        font-weight: 600;
-    }
-    .weather-info {
-        font-size: 0.9rem;
-        opacity: 0.95;
-        font-weight: 500;
-    }
+    .weather-temp { font-size: 2.5rem; font-weight: 600; }
+    .weather-info { font-size: 0.9rem; opacity: 0.95; font-weight: 500; }
     
     /* Map Container */
     .map-container {
@@ -469,9 +465,9 @@ def load_course_data():
         "Surface": ["Paved", "Paved", "Paved", 
                    "Mixed", "Paved", "Mixed", 
                    "Trail", "Paved", "Trail"],
-        "Shade_Level": ["Low", "Medium", "Medium",
-                       "High", "Low", "High",
-                       "High", "Low", "Medium"],
+        "ShLevel": ["Low", "Medium", "Medium",
+                    "High", "Low", "High",
+                    "High", "Low", "Medium"],
         "Water_Fountains": [8, 4, 2, 6, 12, 5, 3, 15, 2],
         "Restrooms": [6, 3, 1, 4, 8, 4, 2, 10, 1],
         "Best_Time": ["Evening", "Night", "Morning",
@@ -509,40 +505,40 @@ def load_course_data():
         ],
         "Spots": [
             [
-                {"name": "더현대 서울 (The Hyundai Seoul)", "name_kr": "세상의모든아침", "tags": "Brunch · Hotel View · Carb Refuel", "map": "https://maps.google.com/?q=세상의모든아침+여의도점", "insta": "https://www.instagram.com/all_thats_morning/"},
-                {"name": "여의도 한강공원 배달존", "name_kr": "카페 진정성", "tags": "Milk Tea · Modern · Instagram Hot", "map": "https://maps.google.com/?q=카페+진정성+여의도점", "insta": "https://www.instagram.com/cafe_jinjungsung/"}
+                {"name": "세상의모든아침 (All That's Morning)", "name_kr": "세상의모든아침 여의도점", "tags": "📷 Brunch · Hotel View · Carb Refuel", "map": "https://maps.google.com/?q=세상의모든아침+여의도점", "insta": "https://www.instagram.com/all_thats_morning/"},
+                {"name": "카페 진정성 (Cafe Jinjeongseong)", "name_kr": "카페 진정성 여의도점", "tags": "☕ Milk Tea · Modern · Instagram Hot", "map": "https://maps.google.com/?q=카페+진정성+여의도점", "insta": "https://www.instagram.com/cafe_jinjungsung/"}
             ],
             [
-                {"name": "뷰클런즈 (Vrewcleans)", "name_kr": "뷰클런즈", "tags": "Songlidangil · Wood Interior · Iced Tea", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
-                {"name": "니커버커베이글 (Knickerbocker Bagel)", "name_kr": "니커버커베이글", "tags": "NYC Style · Carb Heaven · Lake View", "map": "https://maps.google.com/?q=니커버커베이글+송파점", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
+                {"name": "뷰클런즈 (Vrewcleans)", "name_kr": "뷰클런즈 송리단길점", "tags": "☕ Songlidangil · Wood Interior · Iced Tea", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "name_kr": "니커버커베이글 석촌호수점", "tags": "🥯 NYC Style · Carb Heaven · Lake View", "map": "https://maps.google.com/?q=니커버커베이글+송파점", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
             ],
             [
-                {"name": "파리바게뜨 로컬 스토어", "name_kr": "파리바게뜨", "tags": "Fresh Sandwich · Protein · Accessible", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
-                {"name": "이디야커피 공원점", "name_kr": "이디야커피", "tags": "Iced Americano · Quick Hydration", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
+                {"name": "파리바게뜨 (Paris Baguette Local)", "name_kr": "파리바게뜨 로컬 스토어", "tags": "🍞 Fresh Sandwich · Protein · Accessible", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
+                {"name": "이디야커피 (Ediya Coffee)", "name_kr": "이디야커피 공원점", "tags": "☕ Iced Americano · Quick Hydration", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
             ],
             [
-                {"name": "101번지 남산돈까스 본점", "name_kr": "101번지 남산돈까스", "tags": "Classic · Protein Refuel · Must-Try", "map": "https://maps.google.com/?q=101번지+남산돈까스", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
-                {"name": "이중생업 남산", "name_kr": "이중생업", "tags": "Korean Fusion · Clean Pasta · Date Spot", "map": "https://maps.google.com/?q=이중생업+남산", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
+                {"name": "101번지 남산돈까스 (101 Namsan Tonkatsu)", "name_kr": "101번지 남산돈까스 본점", "tags": "🔨 Classic · Protein Refuel · Must-Try", "map": "https://maps.google.com/?q=101번지+남산돈까스", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
+                {"name": "이중생업 남산 (Yijungsaengup)", "name_kr": "이중생업 남산", "tags": "🍝 Korean Fusion · Clean Pasta · Date Spot", "map": "https://maps.google.com/?q=이중생업+남산", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
             ],
             [
-                {"name": "룸서비스301 (Room Service 301)", "name_kr": "룸서비스301", "tags": "Forest View · Dessert Cafe · Aesthetic", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
-                {"name": "캐틀앤비 (Cattle & Bee)", "name_kr": "캐틀앤비", "tags": "Italian Brunch · Terrace · Dogok", "map": "https://maps.google.com/?q=캐틀앤비+양재점", "insta": "https://www.instagram.com/cattle_bee/"}
+                {"name": "룸서비스301 (Room Service 301)", "name_kr": "룸서비스301 양재천점", "tags": "🌳 Forest View · Dessert Cafe · Aesthetic", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
+                {"name": "캐틀앤비 (Cattle & Bee)", "name_kr": "캐틀앤비 도곡점", "tags": "🍳 Italian Brunch · Terrace · Dogok", "map": "https://maps.google.com/?q=캐틀앤비+양재점", "insta": "https://www.instagram.com/cattle_bee/"}
             ],
             [
-                {"name": "라포레스타 (La Foresta)", "name_kr": "라포레스타", "tags": "Pizza & Pasta · Green View · Family", "map": "https://maps.google.com/?q=라포레스타", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
-                {"name": "꿈의숲 미술관 카페", "name_kr": "꿈의숲 미술관 카페", "tags": "Observatory · Smoothie · Culture", "map": "https://maps.google.com/?q=북서울꿈의숲", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
+                {"name": "라포레스타 (La Foresta)", "name_kr": "라포레스타 꿈의숲점", "tags": "🍕 Pizza & Pasta · Green View · Family", "map": "https://maps.google.com/?q=라포레스타", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
+                {"name": "꿈의숲 미술관 카페", "name_kr": "꿈의숲 미술관 카페", "tags": "🏙️ Observatory · Smoothie · Culture", "map": "https://maps.google.com/?q=북서울꿈의숲", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
             ],
             [
-                {"name": "H라운지 (H Lounge) 서촌", "name_kr": "H라운지", "tags": "Italian · Garden Terrace · Post-Hike", "map": "https://maps.google.com/?q=H라운지", "insta": "https://www.instagram.com/explore/tags/서촌브런치/"},
-                {"name": "스태픽스 (Staff Picks)", "name_kr": "스태픽스", "tags": "Outdoor Terrace · Ginkgo · Runner Haven", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
+                {"name": "H라운지 (H Lounge Seochon)", "name_kr": "H라운지 서촌점", "tags": "🍝 Italian · Garden Terrace · Post-Hike", "map": "https://maps.google.com/?q=H라운지", "insta": "https://www.instagram.com/explore/tags/서촌브런치/"},
+                {"name": "스태픽스 (Staff Picks)", "name_kr": "스태픽스 서촌", "tags": "🍂 Outdoor Terrace · Ginkgo · Runner Haven", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
             ],
             [
-                {"name": "아구아구 (Agu Agu) 뚝섬", "name_kr": "아구아구", "tags": "Fresh Salad Bowl · Light Meal · Healthy", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
-                {"name": "뚝섬한강공원 편의점", "name_kr": "한강공원 편의점", "tags": "Powerade · Ice Cup · Instant Ramyun", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
+                {"name": "아구아구 (Agu Agu Ttukseom)", "name_kr": "아구아구 뚝섬점", "tags": "🥗 Fresh Salad Bowl · Light Meal · Healthy", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
+                {"name": "한강공원 편의점 (Riverside Convenience)", "name_kr": "뚝섬한강공원 편의점", "tags": "🥤 Powerade · Ice Cup · Instant Ramyun", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
             ],
             [
-                {"name": "클럽에스프레소 (Club Espresso)", "name_kr": "클럽에스프레소", "tags": "Drip Coffee · Cyclist Haven · Classic", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
-                {"name": "계열사 (Gyeyalsa)", "name_kr": "계열사", "tags": "Seoul Top 3 Chicken · Protein Reward", "map": "https://maps.google.com/?q=계열사+부암동", "insta": "https://www.instagram.com/explore/tags/계열사/"}
+                {"name": "클럽에스프레소 (Club Espresso)", "name_kr": "클럽에스프레소 부암본점", "tags": "☕ Drip Coffee · Cyclist Haven · Classic", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa Chicken)", "name_kr": "계열사 부암점", "tags": "🍗 Seoul Top 3 Chicken · Protein Reward", "map": "https://maps.google.com/?q=계열사+부암동", "insta": "https://www.instagram.com/explore/tags/계열사/"}
             ]
         ],
         "Playlist_Title": [
@@ -617,25 +613,25 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5360, 126.9210], [37.5342, 126.9185], [37.5315, 126.9220],
                 [37.5285, 126.9270], [37.5262, 126.9315], [37.5289, 126.9331]
             ],
-            "colors": ["#34C759"] * 8 # Apple System Green Tint
+            "colors": ["#34C759"] * 8
         },
-        1: {  # Seokchon Lake - Mostly flat with slight bridge incline
+        1: {  # Seokchon Lake
             "coords": [
                 [37.5074, 127.1031], [37.5090, 127.1010], [37.5105, 127.0980],
                 [37.5100, 127.0950], [37.5080, 127.0945], [37.5055, 127.0970],
                 [37.5050, 127.1010], [37.5065, 127.1040], [37.5074, 127.1031]
             ],
-            "colors": ["#34C759", "#34C759", "#34C759", "#FF9500", "#34C759", "#34C759", "#34C759", "#34C759"] # Apple Green & Orange
+            "colors": ["#34C759", "#34C759", "#34C759", "#FF9500", "#34C759", "#34C759", "#34C759", "#34C759"]
         },
-        3: {  # Namsan - Mixed elevation
+        3: {  # Namsan
             "coords": [
                 [37.5509, 126.9909], [37.5490, 126.9940], [37.5465, 126.9930],
                 [37.5440, 126.9890], [37.5460, 126.9830], [37.5495, 126.9810],
                 [37.5525, 126.9850], [37.5530, 126.9890], [37.5509, 126.9909]
             ],
-            "colors": ["#34C759", "#FF9500", "#FF3B30", "#FF9500", "#34C759", "#34C759", "#FF9500", "#FF3B30"] # Apple System Palette
+            "colors": ["#34C759", "#FF9500", "#FF3B30", "#FF9500", "#34C759", "#34C759", "#FF9500", "#FF3B30"]
         },
-        4: {  # Yangjaecheon - Flat stream path
+        4: {  # Yangjaecheon
             "coords": [
                 [37.4934, 127.0601], [37.4950, 127.0650], [37.4975, 127.0720],
                 [37.5002, 127.0790], [37.4990, 127.0810], [37.4960, 127.0740],
@@ -643,7 +639,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
             ],
             "colors": ["#34C759"] * 8
         },
-        5: {  # Dream Forest - Moderate hills
+        5: {  # Dream Forest
             "coords": [
                 [37.6257, 127.0371], [37.6235, 127.0395], [37.6210, 127.0410],
                 [37.6190, 127.0380], [37.6205, 127.0340], [37.6230, 127.0325],
@@ -651,7 +647,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
             ],
             "colors": ["#FF9500", "#FF3B30", "#FF3B30", "#FF9500", "#34C759", "#34C759", "#FF9500", "#FF9500"]
         },
-        6: {  # Inwangsan - Steep trail
+        6: {  # Inwangsan
             "coords": [
                 [37.5758, 126.9583], [37.5785, 126.9550], [37.5810, 126.9535],
                 [37.5845, 126.9560], [37.5860, 126.9600], [37.5830, 126.9630],
@@ -1040,21 +1036,22 @@ else:
             
             spot_col1, spot_col2 = st.columns(2)
             
+            # Integrated Hotspot Component Block (Fixed Spacing Bug)
             for spot_idx, (spot, col) in enumerate(zip(row['Spots'], [spot_col1, spot_col2])):
                 with col:
                     st.markdown(f"""
                         <div class="spot-card">
-                            <div class="spot-name">{spot['name']}</div>
-                            <div style="font-size: 0.85rem; color: #86868B; margin-bottom: 8px;">{spot['name_kr']}</div>
-                            <div class="spot-tags">{spot['tags']}</div>
+                            <div class="spot-header-group">
+                                <div class="spot-name">{spot['name']}</div>
+                                <div style="font-size: 0.825rem; color: #86868B; font-weight: 500;">{spot['name_kr']}</div>
+                                <div class="spot-tags">{spot['tags']}</div>
+                            </div>
+                            <div class="spot-action-container">
+                                <a href="{spot['map']}" target="_blank" class="spot-link-btn">🗺️ View on Google Maps</a>
+                                <a href="{spot['insta']}" target="_blank" class="spot-link-btn">📸 View on Instagram</a>
+                            </div>
                         </div>
                     """, unsafe_allow_html=True)
-                    
-                    btn_col1, btn_col2 = st.columns(2)
-                    with btn_col1:
-                        st.link_button("🗺️ View on Google Maps", spot['map'], use_container_width=True)
-                    with btn_col2:
-                        st.link_button("📸 View on Instagram", spot['insta'], use_container_width=True)
             
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             
