@@ -73,13 +73,17 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.98);
         box-shadow: 0 6px 24px rgba(36,34,32,0.05);
     }
-    .player-cover {
-        width: 60px;
-        height: 60px;
+    /* Highly-Stable Embedded SVG Icon Cover to Prevent Broken Image Links */
+    .player-icon-box {
+        width: 55px;
+        height: 55px;
+        background-color: #242220;
         border-radius: 8px;
-        object-fit: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin-right: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .player-info {
         flex-grow: 1;
@@ -119,11 +123,12 @@ if "page_stage" not in st.session_state:
 if "user_level" not in st.session_state:
     st.session_state.user_level = "Beginner"
 
-# 3. Dataset Setup with Verified Dynamic Image Links & Clean Local Core Names
+# 3. Dataset Setup with Verified Hotspots, Links, and Track Metadata
 @st.cache_data
 def load_course_data():
     data = {
         "Level": ["Beginner", "Beginner", "Beginner", "Intermediate", "Intermediate", "Intermediate", "Advanced", "Advanced", "Advanced"],
+        # Refined perfectly to core local area names without modifiers
         "Course_Name": ["여의도 한강공원", "석촌호수", "동네 근린공원", 
                        "남산 둘레길", "양재천", "북서울꿈의숲", 
                        "인왕산", "뚝섬 한강공원", "부암동"],
@@ -157,7 +162,7 @@ def load_course_data():
             [37.5758, 126.9583], [37.5408, 127.0717], [37.5921, 126.9423]
         ],
         
-        # --- 2 REAL HOTSPOTS PER COURSE WITH MAP/INSTA LINKS ---
+        # --- 2 REAL HOTSPOTS PER COURSE WITH SYSTEM MAP/INSTA LINKS ---
         "Spots": [
             # 1. 여의도
             [
@@ -167,7 +172,7 @@ def load_course_data():
             # 2. 석촌호수
             [
                 {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=Vrewcleans", "insta": "https://www.instagram.com/vrewcleans/"},
-                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=Knickerbocker+Bagel+Seokchon", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=Knickerbocker+Bagel+Seoul", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
             ],
             # 3. 동네공원
             [
@@ -177,7 +182,7 @@ def load_course_data():
             # 4. 남산
             [
                 {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101+Namsan+Donkatsu", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
-                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=Leejungsangeop+Namsan", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
+                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=Leejung+Saengeop+Namsan", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
             ],
             # 5. 양재천
             [
@@ -187,12 +192,12 @@ def load_course_data():
             # 6. 북서울꿈의숲
             [
                 {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=La+Foresta+Seoul", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
-                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=Dream+Forest+Art+Center", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
+                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=North+Seoul+Dream+Forest", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
             ],
             # 7. 인왕산
             [
-                {"name": "통인시장 (Tong인 Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=Tongin+Market", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
-                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=Staff+Picks+Seochon", "insta": "https://www.instagram.com/staffpicks_official/"}
+                {"name": "통인시장 (Tongin Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=Tongin+Market", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
+                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=Staff+Picks+Seoul", "insta": "https://www.instagram.com/staffpicks_official/"}
             ],
             # 8. 뚝섬 한강공원
             [
@@ -201,12 +206,11 @@ def load_course_data():
             ],
             # 9. 부암동
             [
-                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=Club+Espresso+Buam", "insta": "https://www.instagram.com/clubespresso/"},
-                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=Gyeyalsa+Buam", "insta": "https://www.instagram.com/explore/tags/계열사/"}
+                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=Club+Espresso+Seoul", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=Gyeyalsa+Seoul", "insta": "https://www.instagram.com/explore/tags/계열사/"}
             ]
         ],
 
-        # --- 100% UNBROKEN HIGH-QUALITY IMAGES FROM SPOTIFY INTERNET HOST ---
         "Playlist_Title": [
             "Chill Acoustic & Gentle Breeze Pop", "Trendy City Night Grooves", "Bright Morning Warm-Up Beats",
             "Rhythmic Mid-Tempo Running Hits", "Groovy Bassline Urban Anthems", "High-Stamina Cardio Boosters",
@@ -215,57 +219,57 @@ def load_course_data():
         "Playlist_Tracks": [
             # Beginner 1
             [
-                {"title": "Paris in the Rain", "artist": "Lauv", "cover": "https://i.scdn.co/image/ab67616d0000b273df1f07f248e3518e11e0aa06", "link": "https://www.youtube.com/watch?v=kOCkne-Bku4"},
-                {"title": "ILYSB", "artist": "LANY", "cover": "https://i.scdn.co/image/ab67616d0000b2734a94628f4116035985834925", "link": "https://www.youtube.com/watch?v=SSTp0rknOgA"},
-                {"title": "Youth", "artist": "Troye Sivan", "cover": "https://i.scdn.co/image/ab67616d0000b2730da4239db1ee11b8160c5da5", "link": "https://www.youtube.com/watch?v=XYAghEq5Lfw"}
+                {"title": "Paris in the Rain", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=kOCkne-Bku4"},
+                {"title": "ILYSB", "artist": "LANY", "link": "https://www.youtube.com/watch?v=SSTp0rknOgA"},
+                {"title": "Youth", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=XYAghEq5Lfw"}
             ],
             # Beginner 2
             [
-                {"title": "Super Far", "artist": "LANY", "cover": "https://i.scdn.co/image/ab67616d0000b2734a94628f4116035985834925", "link": "https://www.youtube.com/watch?v=B88Zas_DclM"},
-                {"title": "Strawberries & Cigarettes", "artist": "Troye Sivan", "cover": "https://i.scdn.co/image/ab67616d0000b273a5a5db84f50f3b4bc3c8cf5c", "link": "https://www.youtube.com/watch?v=Z3LgC8u_R8Y"},
-                {"title": "I Like Me Better", "artist": "Lauv", "cover": "https://i.scdn.co/image/ab67616d0000b273df1f07f248e3518e11e0aa06", "link": "https://www.youtube.com/watch?v=BcqxLCWn-CE"}
+                {"title": "Super Far", "artist": "LANY", "link": "https://www.youtube.com/watch?v=B88Zas_DclM"},
+                {"title": "Strawberries & Cigarettes", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=Z3LgC8u_R8Y"},
+                {"title": "I Like Me Better", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=BcqxLCWn-CE"}
             ],
             # Beginner 3
             [
-                {"title": "Feelings", "artist": "Lauv", "cover": "https://i.scdn.co/image/ab67616d0000b2732049e7bdfd6b8bda5a782a20", "link": "https://www.youtube.com/watch?v=421w1jR-SgE"},
-                {"title": "Pink Skies", "artist": "LANY", "cover": "https://i.scdn.co/image/ab67616d0000b273468903c7e71fb3d5858cf09f", "link": "https://www.youtube.com/watch?v=eE7T_I9vInU"},
-                {"title": "Wild", "artist": "Troye Sivan", "cover": "https://i.scdn.co/image/ab67616d0000b2730da4239db1ee11b8160c5da5", "link": "https://www.youtube.com/watch?v=fdXNNveYOfU"}
+                {"title": "Feelings", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=421w1jR-SgE"},
+                {"title": "Pink Skies", "artist": "LANY", "link": "https://www.youtube.com/watch?v=eE7T_I9vInU"},
+                {"title": "Wild", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=fdXNNveYOfU"}
             ],
             # Intermediate 1
             [
-                {"title": "Attention", "artist": "Charlie Puth", "cover": "https://i.scdn.co/image/ab67616d0000b273b320df949ff03010f3bc30f9", "link": "https://www.youtube.com/watch?v=nfs8NYg7yQM"},
-                {"title": "Shivers", "artist": "Ed Sheeran", "cover": "https://i.scdn.co/image/ab67616d0000b273ba5db46f4b0c161d2730ca9c", "link": "https://www.youtube.com/watch?v=Il0S8BoucSA"},
-                {"title": "Light Switch", "artist": "Charlie Puth", "cover": "https://i.scdn.co/image/ab67616d0000b27387201c107e3bc1cfec0b88d8", "link": "https://www.youtube.com/watch?v=WFsAon_TWPQ"}
+                {"title": "Attention", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=nfs8NYg7yQM"},
+                {"title": "Shivers", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=Il0S8BoucSA"},
+                {"title": "Light Switch", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=WFsAon_TWPQ"}
             ],
             # Intermediate 2
             [
-                {"title": "How Long", "artist": "Charlie Puth", "cover": "https://i.scdn.co/image/ab67616d0000b273b320df949ff03010f3bc30f9", "link": "https://www.youtube.com/watch?v=TdylllyoV9c"},
-                {"title": "Unholy", "artist": "Sam Smith", "cover": "https://i.scdn.co/image/ab67616d0000b273a6a39ae9ff9be8353fb50942", "link": "https://www.youtube.com/watch?v=Uq9gPaizbe8"},
-                {"title": "Bad Habits", "artist": "Ed Sheeran", "cover": "https://i.scdn.co/image/ab67616d0000b273ba5db46f4b0c161d2730ca9c", "link": "https://www.youtube.com/watch?v=orJSJGHjBLI"}
+                {"title": "How Long", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=TdylllyoV9c"},
+                {"title": "Unholy", "artist": "Sam Smith", "link": "https://www.youtube.com/watch?v=Uq9gPaizbe8"},
+                {"title": "Bad Habits", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=orJSJGHjBLI"}
             ],
             # Intermediate 3
             [
-                {"title": "Shape of You", "artist": "Ed Sheeran", "cover": "https://i.scdn.co/image/ab67616d0000b273ba5db46f4b0c161d2730ca9c", "link": "https://www.youtube.com/watch?v=JGwWNGJdvx8"},
-                {"title": "Diamonds", "artist": "Sam Smith", "cover": "https://i.scdn.co/image/ab67616d0000b273da944ec764df7f847524584a", "link": "https://www.youtube.com/watch?v=8RvAKRoDB7o"},
-                {"title": "Left and Right", "artist": "Charlie Puth (feat. Jungkook)", "cover": "https://i.scdn.co/image/ab67616d0000b27318357fc10915ff76bcba3380", "link": "https://www.youtube.com/watch?v=a7GITgqwDVg"}
+                {"title": "Shape of You", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=JGwWNGJdvx8"},
+                {"title": "Diamonds", "artist": "Sam Smith", "link": "https://www.youtube.com/watch?v=8RvAKRoDB7o"},
+                {"title": "Left and Right", "artist": "Charlie Puth (feat. Jungkook)", "link": "https://www.youtube.com/watch?v=a7GITgqwDVg"}
             ],
             # Advanced 1
             [
-                {"title": "Dynamite", "artist": "BTS", "cover": "https://i.scdn.co/image/ab67616d0000b2730c071d655f0b50302f3a60ac", "link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
-                {"title": "Kill This Love", "artist": "BLACKPINK", "cover": "https://i.scdn.co/image/ab67616d0000b27388aa44498522696614cb9131", "link": "https://www.youtube.com/watch?v=2S24-y0Ij3Y"},
-                {"title": "HUMBLE.", "artist": "Kendrick Lamar", "cover": "https://i.scdn.co/image/ab67616d0000b2734370db7e49ed0352ef2049d5", "link": "https://www.youtube.com/watch?v=tvTRZJ-4EyI"}
+                {"title": "Dynamite", "artist": "BTS", "link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
+                {"title": "Kill This Love", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=2S24-y0Ij3Y"},
+                {"title": "HUMBLE.", "artist": "Kendrick Lamar", "link": "https://www.youtube.com/watch?v=tvTRZJ-4EyI"}
             ],
             # Advanced 2
             [
-                {"title": "Pink Venom", "artist": "BLACKPINK", "cover": "https://i.scdn.co/image/ab67616d0000b2737604b96791e81be802fe619c", "link": "https://www.youtube.com/watch?v=glhXCuM_Y7M"},
-                {"title": "SICKO MODE", "artist": "Travis Scott", "cover": "https://i.scdn.co/image/ab67616d0000b273072b98f6ba164993d085942f", "link": "https://www.youtube.com/watch?v=d-JBBNg8YKs"},
-                {"title": "MIC Drop", "artist": "BTS (Steve Aoki Remix)", "cover": "https://i.scdn.co/image/ab67616d0000b2730c071d655f0b50302f3a60ac", "link": "https://www.youtube.com/watch?v=kTlv5_i8ICM"}
+                {"title": "Pink Venom", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=glhXCuM_Y7M"},
+                {"title": "SICKO MODE", "artist": "Travis Scott", "link": "https://www.youtube.com/watch?v=d-JBBNg8YKs"},
+                {"title": "MIC Drop", "artist": "BTS (Steve Aoki Remix)", "link": "https://www.youtube.com/watch?v=kTlv5_i8ICM"}
             ],
             # Advanced 3
             [
-                {"title": "Run BTS", "artist": "BTS", "cover": "https://i.scdn.co/image/ab67616d0000b273617be34015df3cc8df179ebc", "link": "https://www.youtube.com/watch?v=9tG70B3DLIY"},
-                {"title": "How You Like That", "artist": "BLACKPINK", "cover": "https://i.scdn.co/image/ab67616d0000b2737604b96791e81be802fe619c", "link": "https://www.youtube.com/watch?v=ioNng23DkIM"},
-                {"title": "Lose Yourself", "artist": "Eminem", "cover": "https://i.scdn.co/image/ab67616d0000b273b6ebe21bc277da204e339f4a", "link": "https://www.youtube.com/watch?v=_Yhyp_hXnyU"}
+                {"title": "Run BTS", "artist": "BTS", "link": "https://www.youtube.com/watch?v=9tG70B3DLIY"},
+                {"title": "How You Like That", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=ioNng23DkIM"},
+                {"title": "Lose Yourself", "artist": "Eminem", "link": "https://www.youtube.com/watch?v=_Yhyp_hXnyU"}
             ]
         ]
     }
@@ -410,7 +414,7 @@ else:
         
         st.markdown("---")
         
-        # 3) Full Width Nearby Places
+        # 3) Full Width Nearby Places with Anglicized Link Buttons
         st.markdown("#### ☕ Nearby Places")
         spot_list = course_row['Spots']
         col_spot1, col_spot2 = st.columns(2)
@@ -431,7 +435,7 @@ else:
             
         st.markdown("---")
         
-        # 4) Full Width Custom Music Player Grid (Melon/Spotify Layout Style)
+        # 4) Full Width Custom Music Player Grid (Stable Scalable SVG Music Icons)
         st.markdown("#### 🎵 Recommended Playlist")
         st.write(f"**Theme: {course_row['Playlist_Title']}**")
         st.caption("Click '▶ Play' to instantly open and stream the track on YouTube.")
@@ -439,7 +443,11 @@ else:
         for track in course_row['Playlist_Tracks']:
             st.markdown(f"""
                 <div class="player-row">
-                    <img src="{track['cover']}" class="player-cover">
+                    <div class="player-icon-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17C6 19.21 7.79 21 10 21C12.21 21 14 19.21 14 17V7H18V3H12Z" fill="#F7F4EB"/>
+                        </svg>
+                    </div>
                     <div class="player-info">
                         <div class="player-title">{track['title']}</div>
                         <div class="player-artist">{track['artist']}</div>
