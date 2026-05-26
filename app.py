@@ -76,9 +76,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. Initialize Session State for Multi-step Navigation
-if "diagnosed" not in st.session_state:
-    st.session_state.diagnosed = False
+# 2. Initialize Session State for Multi-step Navigation (Welcome -> Survey -> Dashboard)
+if "page_stage" not in st.session_state:
+    st.session_state.page_stage = "welcome"
 if "user_level" not in st.session_state:
     st.session_state.user_level = "Beginner"
 
@@ -120,52 +120,52 @@ def load_course_data():
             [37.5758, 126.9583], [37.5408, 127.0717], [37.5921, 126.9423]
         ],
         
-        # --- 2 REAL HOTSPOTS PER COURSE WITH MAP/INSTA LINKS ---
+        # --- 2 REAL HOTSPOTS PER COURSE ---
         "Spots": [
             # 1. 여의도
             [
-                {"name": "더현대 서울 (The Hyundai Seoul)", "tags": "#쇼핑몰 #에어컨빵빵 #러닝후구경", "map": "https://maps.google.com/?q=더현대+서울", "insta": "https://www.instagram.com/thehyundai_seoul/"},
-                {"name": "여의도 한강공원 배달존", "tags": "#돗자리 #한강라면 #치맥 #러너성지", "map": "https://maps.google.com/?q=여의도+한강공원+배달존", "insta": "https://www.instagram.com/explore/tags/한강라면/"}
+                {"name": "더현대 서울 (The Hyundai Seoul)", "tags": "#쇼핑몰 #에어컨빵빵 #러닝후구경", "map": "https://maps.google.com/?q=The+Hyundai+Seoul", "insta": "https://www.instagram.com/thehyundai_seoul/"},
+                {"name": "여의도 한강공원 배달존", "tags": "#돗자리 #한강라면 #치맥 #러너성지", "map": "https://maps.google.com/?q=Yeouido+Hangang+Park", "insta": "https://www.instagram.com/explore/tags/한강라면/"}
             ],
             # 2. 석촌호수
             [
-                {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
-                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=니커버커베이글+송파점", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
+                {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=Vrewcleans", "insta": "https://www.instagram.com/vrewcleans/"},
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=Knickerbocker+Bagel+Seoul", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
             ],
             # 3. 동네공원
             [
-                {"name": "파리바게뜨 로컬 스토어", "tags": "#갓구운빵 #아이스아메리카노 #접근성최고", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
-                {"name": "이디야커피 공원점", "tags": "#가성비카페 #수분충전 #러닝마무리", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
+                {"name": "파리바게뜨 로컬 스토어", "tags": "#갓구운빵 #아이스아메리카노 #접근성최고", "map": "https://maps.google.com/?q=Paris+Baguette+Korea", "insta": "https://www.instagram.com/parisbaguette_kr/"},
+                {"name": "이디야커피 공원점", "tags": "#가성비카페 #수분충전 #러닝마무리", "map": "https://maps.google.com/?q=Ediya+Coffee", "insta": "https://www.instagram.com/ediya.coffee/"}
             ],
             # 4. 남산
             [
-                {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101번지+남산돈까스+본점", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
-                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=이중생업", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
+                {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101+Namsan+Donkatsu", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
+                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=Namsan+Seoul", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
             ],
             # 5. 양재천
             [
-                {"name": "룸서비스301 (Room Service 301)", "tags": "#양재천카페거리 #창가뷰 #숲감성", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
-                {"name": "캐틀앤비 (Cattle & Bee)", "tags": "#테라스카페 #도곡동브런치 #분위기맛집", "map": "https://maps.google.com/?q=캐틀앤비+양재점", "insta": "https://www.instagram.com/cattle_bee/"}
+                {"name": "룸서비스301 (Room Service 301)", "tags": "#양재천카페거리 #창가뷰 #숲감성", "map": "https://maps.google.com/?q=Room+Service+301", "insta": "https://www.instagram.com/roomservice301/"},
+                {"name": "캐틀앤비 (Cattle & Bee)", "tags": "#테라스카페 #도곡동브런치 #분위기맛집", "map": "https://maps.google.com/?q=Cattle+and+Bee+Dogok", "insta": "https://www.instagram.com/cattle_bee/"}
             ],
             # 6. 북서울꿈의숲
             [
-                {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=라포레스타", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
-                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=북서울꿈의숲+아트센터", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
+                {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=La+Foresta+Seoul", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
+                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=North+Seoul+Dream+Forest", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
             ],
             # 7. 인왕산
             [
-                {"name": "통인시장 (Tongin Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=통인시장", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
-                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
+                {"name": "통인시장 (Tongin Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=Tongin+Market", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
+                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=Staff+Picks+Seoul", "insta": "https://www.instagram.com/staffpicks_official/"}
             ],
             # 8. 하프 마라톤
             [
-                {"name": "아구아구 (Agu Agu) 뚝섬", "tags": "#포크샐러드 #러너식단 #리프레시", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
-                {"name": "뚝섬한강공원 편의점", "tags": "#파워에이드 #에너지젤보충 #보급기지", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
+                {"name": "아구아구 (Agu Agu) 뚝섬", "tags": "#포크샐러드 #러너식단 #리프레시", "map": "https://maps.google.com/?q=Ttukseom+Park", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
+                {"name": "뚝섬한강공원 편의점", "tags": "#파워에이드 #에너지젤보충 #보급기지", "map": "https://maps.google.com/?q=Ttukseom+Hangang+Park", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
             ],
             # 9. 10비트
             [
-                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
-                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=계열사", "insta": "https://www.instagram.com/explore/tags/계열사/"}
+                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=Club+Espresso+Buam", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=Gyeyalsa", "insta": "https://www.instagram.com/explore/tags/계열사/"}
             ]
         ],
 
@@ -266,10 +266,26 @@ def get_custom_route(center_lat, center_lng, course_idx):
         points.append({"coord": [lat, lng], "color": color})
     return points
 
-# --- STEP 1: WELCOME & DIAGNOSTIC PAGE ---
-if not st.session_state.diagnosed:
+# --- PAGE 1: INTRO WELCOME PAGE ---
+if st.session_state.page_stage == "welcome":
     st.title("🏃‍♂️ Run-Step Datahub")
-    st.subheader("Find the perfect running course tailored to your physical fitness.")
+    st.markdown("### Welcome to the Personalized Running Course Recommendation System")
+    st.write("Run-Step analyzes your running stamina and target pace to provide optimal running trails across Seoul, complete with real-time terrain difficulty grading and curated lifestyle hotspots.")
+    st.markdown("---")
+    st.markdown("""
+        **Project Metadata:**
+        * **Course:** Arts and Big Data (Sungkyunkwan University)
+        * **Developer:** Yeonhu Lee (Student ID: 2024314274)
+    """)
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🚀 Get Started"):
+        st.session_state.page_stage = "survey"
+        st.rerun()
+
+# --- PAGE 2: DIAGNOSTIC SURVEY PAGE ---
+elif st.session_state.page_stage == "survey":
+    st.title("🏃‍♂️ Run-Step Datahub")
+    st.subheader("Analyze Your Running Profile")
     st.write("Please answer two simple questions to unlock your custom running tracks.")
     st.markdown("---")
     
@@ -299,16 +315,16 @@ if not st.session_state.diagnosed:
             else:
                 st.session_state.user_level = "Intermediate"
             
-            st.session_state.diagnosed = True
+            st.session_state.page_stage = "dashboard"
             st.rerun()
 
-# --- STEP 2: CUSTOM RECOMMENDATION DASHBOARD ---
+# --- PAGE 3: MAIN RECOMMENDATION DASHBOARD ---
 else:
     col_back, col_level_select = st.columns([1, 1])
     
     with col_back:
         if st.button("↩️ Re-take Diagnostic Test"):
-            st.session_state.diagnosed = False
+            st.session_state.page_stage = "welcome"
             st.rerun()
             
     with col_level_select:
@@ -320,18 +336,15 @@ else:
         
     st.title("🏃‍♂️ Your Custom Run-Step Dashboard")
     st.markdown(f"The currently selected course difficulty level is **[{st.session_state.user_level}]**.")
+    st.markdown("---")
     
     filtered_df = df[df["Level"] == st.session_state.user_level]
-    
-    st.markdown("---")
-    st.write("### 📍 Recommended Course Explorer")
-    st.write("Below sections expand across the entire width of the screen for an optimized browsing experience.")
     
     tab_names = [f"📌 {row['Course_Name']}" for _, row in filtered_df.iterrows()]
     tabs = st.tabs(tab_names)
     
     def render_course_tab(course_row, internal_idx):
-        # 1) Clean Header without explicit 'Course Name:' labels
+        # 1) Clean Header with raw course name
         st.markdown(f"# {course_row['Course_Name']}")
         
         c1, c2, c3 = st.columns(3)
@@ -360,8 +373,8 @@ else:
         
         st.markdown("---")
         
-        # 3) Full Width Nearby Hotspots (2 real spots side-by-side with genuine maps/insta links)
-        st.markdown("#### ☕ Nearby Places (Hotspots for Runners)")
+        # 3) Full Width Nearby Places with Anglicized Buttons & Genuine Hotspots
+        st.markdown("#### ☕ Nearby Places")
         spot_list = course_row['Spots']
         col_spot1, col_spot2 = st.columns(2)
         
@@ -369,20 +382,20 @@ else:
             st.markdown(f"##### 📍 {spot_list[0]['name']}")
             st.caption(spot_list[0]['tags'])
             sc1, sc2 = st.columns(2)
-            sc1.link_button("🗺️ 구글 지도 링크", spot_list[0]['map'])
-            sc2.link_button("📸 인스타그램 링크", spot_list[0]['insta'])
+            sc1.link_button("🗺️ View on Google Maps", spot_list[0]['map'])
+            sc2.link_button("📸 View on Instagram", spot_list[0]['insta'])
             
         with col_spot2:
             st.markdown(f"##### 📍 {spot_list[1]['name']}")
             st.caption(spot_list[1]['tags'])
             sc3, sc4 = st.columns(2)
-            sc3.link_button("🗺️ 구글 지도 링크", spot_list[1]['map'])
-            sc4.link_button("📸 인스타그램 링크", spot_list[1]['insta'])
+            sc3.link_button("🗺️ View on Google Maps", spot_list[1]['map'])
+            sc4.link_button("📸 View on Instagram", spot_list[1]['insta'])
             
         st.markdown("---")
         
-        # 4) Full Width Custom Music Player Grid (Melon/Spotify Layout Style)
-        st.markdown("#### 🎵 Running Playlist")
+        # 4) Full Width Custom Music Player Grid
+        st.markdown("#### 🎵 Recommended Playlist")
         st.write(f"**Theme: {course_row['Playlist_Title']}**")
         st.caption("Click '▶ Play' to instantly open and stream the track on YouTube.")
         
@@ -405,4 +418,4 @@ else:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v6.1 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
+    st.caption("Run-Step Dashboard v6.2 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
