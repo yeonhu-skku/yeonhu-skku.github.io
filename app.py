@@ -157,56 +157,56 @@ def load_course_data():
             [37.5758, 126.9583], [37.5408, 127.0717], [37.5921, 126.9423]
         ],
         
-        # --- 2 REAL HOTSPOTS PER COURSE WITH CLEAN LOCAL TITLES ---
+        # --- 2 REAL HOTSPOTS PER COURSE WITH MAP/INSTA LINKS ---
         "Spots": [
             # 1. 여의도
             [
-                {"name": "더현대 서울 (The Hyundai Seoul)", "tags": "#쇼핑몰 #에어컨빵빵 #러닝후구경", "map": "https://maps.google.com/?q=더현대+서울", "insta": "https://www.instagram.com/thehyundai_seoul/"},
-                {"name": "여의도 한강공원 배달존", "tags": "#돗자리 #한강라면 #치맥 #러너성지", "map": "https://maps.google.com/?q=여의도+한강공원", "insta": "https://www.instagram.com/explore/tags/한강라면/"}
+                {"name": "더현대 서울 (The Hyundai Seoul)", "tags": "#쇼핑몰 #에어컨빵빵 #러닝후구경", "map": "https://maps.google.com/?q=The+Hyundai+Seoul", "insta": "https://www.instagram.com/thehyundai_seoul/"},
+                {"name": "여의도 한강공원 배달존", "tags": "#돗자리 #한강라면 #치맥 #러너성지", "map": "https://maps.google.com/?q=Yeouido+Hangang+Park", "insta": "https://www.instagram.com/explore/tags/한강라면/"}
             ],
             # 2. 석촌호수
             [
-                {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
-                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=니커버커베이글+송리단길", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
+                {"name": "뷰클런즈 (Vrewcleans)", "tags": "#송리단길 #쉼이있는카페 #나무인테리어", "map": "https://maps.google.com/?q=Vrewcleans", "insta": "https://www.instagram.com/vrewcleans/"},
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "tags": "#웨이팅맛집 #탄수화물보충 #호수뷰", "map": "https://maps.google.com/?q=Knickerbocker+Bagel+Seokchon", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
             ],
             # 3. 동네공원
             [
-                {"name": "파리바게뜨 로컬 스토어", "tags": "#갓구운빵 #아이스아메리카노 #접근성최고", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
-                {"name": "이디야커피 공원점", "tags": "#가성비카페 #수분충전 #러닝마무리", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
+                {"name": "파리바게뜨 로컬 스토어", "tags": "#갓구운빵 #아이스아메리카노 #접근성최고", "map": "https://maps.google.com/?q=Paris+Baguette+Seoul", "insta": "https://www.instagram.com/parisbaguette_kr/"},
+                {"name": "이디야커피 공원점", "tags": "#가성비카페 #수분충전 #러닝마무리", "map": "https://maps.google.com/?q=Ediya+Coffee+Seoul", "insta": "https://www.instagram.com/ediya.coffee/"}
             ],
             # 4. 남산
             [
-                {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101번지+남산돈까스", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
-                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=이중생업+남산", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
+                {"name": "101번지 남산돈까스 본점", "tags": "#단백질보충 #러너필수코스 #원조돈까스", "map": "https://maps.google.com/?q=101+Namsan+Donkatsu", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
+                {"name": "이중생업 남산", "tags": "#남산감성맛집 #깔끔한한식 #러닝데이트", "map": "https://maps.google.com/?q=Leejungsangeop+Namsan", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
             ],
             # 5. 양재천
             [
-                {"name": "룸서비스301 (Room Service 301)", "tags": "#양재천카페거리 #창가뷰 #숲감성", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
-                {"name": "캐틀앤비 (Cattle & Bee)", "tags": "#테라스카페 #도곡동브런치 #분위기맛집", "map": "https://maps.google.com/?q=캐틀앤비+양재천점", "insta": "https://www.instagram.com/cattle_bee/"}
+                {"name": "룸서비스301 (Room Service 301)", "tags": "#양재천카페거리 #창가뷰 #숲감성", "map": "https://maps.google.com/?q=Room+Service+301", "insta": "https://www.instagram.com/roomservice301/"},
+                {"name": "캐틀앤비 (Cattle & Bee)", "tags": "#테라스카페 #도곡동브런치 #분위기맛집", "map": "https://maps.google.com/?q=Cattle+and+Bee+Dogok", "insta": "https://www.instagram.com/cattle_bee/"}
             ],
             # 6. 북서울꿈의숲
             [
-                {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=라포레스타+북서울꿈의숲", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
-                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=북서울꿈의숲+미술관", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
+                {"name": "라포레스타 (La Foresta)", "tags": "#꿈의숲일식양식 #통창뷰 #힐링식사", "map": "https://maps.google.com/?q=La+Foresta+Seoul", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
+                {"name": "꿈의숲 미술관 카페", "tags": "#전망좋은곳 #시원한음료 #문화생활", "map": "https://maps.google.com/?q=Dream+Forest+Art+Center", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
             ],
             # 7. 인왕산
             [
-                {"name": "통인시장 (Tongin Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=통인시장", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
-                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
+                {"name": "통인시장 (Tong인 Market)", "tags": "#엽전도시락 #기름떡볶이 #서촌감성", "map": "https://maps.google.com/?q=Tongin+Market", "insta": "https://www.instagram.com/explore/tags/통인시장/"},
+                {"name": "스태픽스 (Staff Picks)", "tags": "#서촌야외테라스 #은행나무맛집 #인스타핫플", "map": "https://maps.google.com/?q=Staff+Picks+Seochon", "insta": "https://www.instagram.com/staffpicks_official/"}
             ],
             # 8. 뚝섬 한강공원
             [
-                {"name": "아구아구 (Agu Agu) 뚝섬", "tags": "#포크샐러드 #러너식단 #리프레시", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
-                {"name": "뚝섬한강공원 편의점", "tags": "#파워에이드 #에너지젤보충 #보급기지", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
+                {"name": "아구아구 (Agu Agu) 뚝섬", "tags": "#포크샐러드 #러너식단 #리프레시", "map": "https://maps.google.com/?q=Agu+Agu+Ttukseom", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
+                {"name": "뚝섬한강공원 편의점", "tags": "#파워에이드 #에너지젤보충 #보급기지", "map": "https://maps.google.com/?q=Ttukseom+Hangang+Park", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
             ],
             # 9. 부암동
             [
-                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
-                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=계열사", "insta": "https://www.instagram.com/explore/tags/계열사/"}
+                {"name": "클럽에스프레소 (Club Espresso)", "tags": "#부암동터줏대감 #드립커피맛집 #러너성지", "map": "https://maps.google.com/?q=Club+Espresso+Buam", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa)", "tags": "#서울3대치킨 #인왕산하산푸드 #치맥치트키", "map": "https://maps.google.com/?q=Gyeyalsa+Buam", "insta": "https://www.instagram.com/explore/tags/계열사/"}
             ]
         ],
 
-        # --- 100% UNBROKEN HIGH-QUALITY IMAGES ---
+        # --- 100% UNBROKEN HIGH-QUALITY IMAGES FROM SPOTIFY INTERNET HOST ---
         "Playlist_Title": [
             "Chill Acoustic & Gentle Breeze Pop", "Trendy City Night Grooves", "Bright Morning Warm-Up Beats",
             "Rhythmic Mid-Tempo Running Hits", "Groovy Bassline Urban Anthems", "High-Stamina Cardio Boosters",
@@ -311,7 +311,7 @@ if st.session_state.page_stage == "welcome":
     st.markdown("---")
     st.markdown("""
         **Project Metadata:**
-        * **Course:** Arts and Big Data (Sungkyunkwan University) [cite: 1, 4]
+        * **Course:** Arts and Big Data (Sungkyunkwan University)
         * **Developer:** Yeonhu Lee (Student ID: 2024314274)
     """)
     st.markdown("<br>", unsafe_allow_html=True)
@@ -455,4 +455,4 @@ else:
             render_course_tab(row, orig_idx)
         
     st.markdown("---")
-    st.caption("Run-Step Dashboard v6.3 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)") [cite: 4]
+    st.caption("Run-Step Dashboard v6.3 | Developed by Yeonhu Lee (SKKU Student ID: 2024314274)")
