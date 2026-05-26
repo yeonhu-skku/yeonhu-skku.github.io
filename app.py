@@ -5,7 +5,7 @@ from streamlit_folium import st_folium
 from datetime import datetime
 
 # ============================================================
-# 1. PAGE CONFIGURATION & CUSTOM THEME
+# 1. PAGE CONFIGURATION & CUSTOM THEME (Apple Minimal)
 # ============================================================
 st.set_page_config(
     page_title="Run-Step | Seoul Running Guide",
@@ -14,15 +14,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Premium Minimal CSS Theme - Inspired by Strava/Nike Run Club aesthetics
+# Premium Minimal CSS Theme - Fully Inspired by Apple iOS & Apple Fitness Aesthetics
 st.markdown("""
 <style>
-    @import url('[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap)');
-    
-    /* Global Reset & Base */
+    /* Global Reset & Base (Apple System Native Fonts) */
     .stApp {
-        background: linear-gradient(180deg, #FAFAF8 0%, #F5F3EE 100%);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(180deg, #FAFAFC 0%, #F5F5F7 100%);
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
     }
     
     /* Hide Streamlit Branding */
@@ -30,86 +29,98 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Typography System */
+    /* Apple Typography System */
     h1 {
         font-size: 2.75rem !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.03em !important;
-        color: #1A1A1A !important;
-        line-height: 1.1 !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.025em !important;
+        color: #1D1D1F !important;
+        line-height: 1.15 !important;
     }
     h2 {
         font-size: 1.5rem !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.02em !important;
-        color: #1A1A1A !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.015em !important;
+        color: #1D1D1F !important;
     }
     h3 {
         font-size: 1.125rem !important;
         font-weight: 600 !important;
-        color: #2D2D2D !important;
+        color: #1D1D1F !important;
+        letter-spacing: -0.01em !important;
     }
     p, .stMarkdown {
-        color: #4A4A4A;
-        line-height: 1.6;
+        color: #515154;
+        line-height: 1.55;
     }
     
-    /* Premium Card Component */
+    /* Apple Premium Card Component */
     .premium-card {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 18px;
         padding: 28px;
         box-shadow: 
-            0 4px 24px rgba(0, 0, 0, 0.04),
-            0 1px 2px rgba(0, 0, 0, 0.02);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            0 4px 30px rgba(0, 0, 0, 0.02),
+            0 1px 2px rgba(0, 0, 0, 0.01);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .premium-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.95);
         box-shadow: 
-            0 12px 40px rgba(0, 0, 0, 0.08),
-            0 4px 12px rgba(0, 0, 0, 0.04);
+            0 12px 36px rgba(0, 0, 0, 0.05),
+            0 4px 12px rgba(0, 0, 0, 0.02);
     }
     
-    /* Metric Display */
+    /* Metric Display (Apple Dashboard Style) */
     .metric-container {
-        background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
-        border-radius: 16px;
+        background: #FFFFFF;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        border-radius: 14px;
         padding: 20px 24px;
         text-align: center;
-        transition: transform 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+        transition: all 0.25s ease;
     }
     .metric-container:hover {
         transform: scale(1.02);
+        border-color: rgba(0, 0, 0, 0.15);
     }
     .metric-value {
         font-size: 2rem;
-        font-weight: 800;
-        color: #FFFFFF;
+        font-weight: 700;
+        color: #1D1D1F;
         letter-spacing: -0.02em;
         margin-bottom: 4px;
     }
     .metric-label {
         font-size: 0.75rem;
         font-weight: 600;
-        color: rgba(255, 255, 255, 0.6);
+        color: #86868B;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
     }
     
-    /* Accent Metric (Orange) */
+    /* Accent Metric (Apple Fitness Activity Orange Accent) */
     .metric-accent {
-        background: linear-gradient(135deg, #E85A3C 0%, #D64A2C 100%);
+        background: #1D1D1F;
+        border: none;
+    }
+    .metric-accent .metric-value {
+        color: #FF453A; /* Apple Activity Ring Scarlet Red */
+    }
+    .metric-accent .metric-label {
+        color: rgba(255, 255, 255, 0.5);
     }
     
     /* Tag Pills */
     .tag-pill {
         display: inline-block;
-        background: #F0EDE6;
-        color: #5C5C5C;
+        background: #E8E8ED;
+        color: #424245;
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 0.8rem;
@@ -118,8 +129,8 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     .tag-pill:hover {
-        background: #E8E4DC;
-        color: #3A3A3A;
+        background: #D2D2D7;
+        color: #1D1D1F;
     }
     
     /* Level Badge */
@@ -134,44 +145,46 @@ st.markdown("""
         letter-spacing: -0.01em;
     }
     .level-beginner {
-        background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
-        color: #2E7D32;
+        background: rgba(52, 199, 89, 0.15); /* Apple Green */
+        color: #248A3D;
     }
     .level-intermediate {
-        background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-        color: #E65100;
+        background: rgba(255, 149, 0, 0.15); /* Apple Orange */
+        color: #C27200;
     }
     .level-advanced {
-        background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
-        color: #C62828;
+        background: rgba(255, 59, 48, 0.15); /* Apple Red */
+        color: #D32F2F;
     }
     
-    /* Music Player Card */
+    /* Apple Music Style Player Card Component */
     .player-card {
         display: flex;
         align-items: center;
-        background: #FFFFFF;
+        background: rgba(255, 255, 255, 0.8);
         border-radius: 14px;
         padding: 16px 20px;
         margin-bottom: 10px;
-        border: 1px solid #F0EDE6;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
     .player-card:hover {
-        background: #FAFAF8;
-        border-color: #E8E4DC;
+        background: #FFFFFF;
+        border-color: rgba(0, 0, 0, 0.15);
         transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
     .player-artwork {
         width: 52px;
         height: 52px;
-        background: linear-gradient(135deg, #1A1A1A 0%, #3D3D3D 100%);
-        border-radius: 10px;
+        background: linear-gradient(135deg, #FF2D55 0%, #FA243C 100%); /* Apple Music Signature Crimson */
+        border-radius: 50%; /* Rounded circular token inspired by Apple Music UI */
         display: flex;
         align-items: center;
         justify-content: center;
         margin-right: 16px;
         flex-shrink: 0;
+        box-shadow: 0 4px 10px rgba(250,36,60,0.2);
     }
     .player-info {
         flex-grow: 1;
@@ -180,7 +193,7 @@ st.markdown("""
     .player-title {
         font-size: 0.95rem;
         font-weight: 600;
-        color: #1A1A1A;
+        color: #1D1D1F;
         margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
@@ -188,11 +201,11 @@ st.markdown("""
     }
     .player-artist {
         font-size: 0.8rem;
-        color: #8A8A8A;
+        color: #86868B;
         font-weight: 500;
     }
     .play-button {
-        background: #1A1A1A;
+        background: #1D1D1F;
         color: #FFFFFF !important;
         padding: 10px 20px;
         border-radius: 24px;
@@ -203,39 +216,41 @@ st.markdown("""
         flex-shrink: 0;
     }
     .play-button:hover {
-        background: #E85A3C;
-        transform: scale(1.05);
+        background: #FA243C;
+        transform: scale(1.04);
+        box-shadow: 0 4px 12px rgba(250,36,60,0.3);
     }
     
-    /* Spot Card */
+    /* Apple Maps Style Spot Card */
     .spot-card {
         background: #FFFFFF;
         border-radius: 16px;
         padding: 24px;
-        border: 1px solid #F0EDE6;
+        border: 1px solid rgba(0, 0, 0, 0.06);
         height: 100%;
         transition: all 0.3s ease;
     }
     .spot-card:hover {
-        border-color: #E85A3C;
-        box-shadow: 0 8px 30px rgba(232, 90, 60, 0.1);
+        border-color: #007AFF; /* Apple Maps System Blue Tint */
+        box-shadow: 0 8px 30px rgba(0, 122, 255, 0.06);
     }
     .spot-name {
         font-size: 1.1rem;
-        font-weight: 700;
-        color: #1A1A1A;
+        font-weight: 600;
+        color: #1D1D1F;
         margin-bottom: 12px;
+        letter-spacing: -0.01em;
     }
     .spot-tags {
         font-size: 0.8rem;
-        color: #8A8A8A;
+        color: #86868B;
         line-height: 1.5;
         margin-bottom: 16px;
     }
     
-    /* Custom Buttons */
+    /* Custom Streamlit Buttons (Apple System Accent Style) */
     .stButton > button {
-        background: #1A1A1A !important;
+        background: #1D1D1F !important;
         color: #FFFFFF !important;
         border: none !important;
         border-radius: 28px !important;
@@ -243,20 +258,20 @@ st.markdown("""
         font-weight: 600 !important;
         font-size: 0.95rem !important;
         letter-spacing: -0.01em !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
     }
     .stButton > button:hover {
-        background: #E85A3C !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(232, 90, 60, 0.3) !important;
+        background: #007AFF !important; /* Apple Vivid Blue */
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 20px rgba(0, 122, 255, 0.25) !important;
     }
     
-    /* Link Buttons */
+    /* Link Buttons (Apple Bordered Button Theme) */
     .stLinkButton > a {
         background: transparent !important;
-        color: #1A1A1A !important;
-        border: 2px solid #E8E4DC !important;
+        color: #007AFF !important;
+        border: 1px solid rgba(0, 122, 255, 0.2) !important;
         border-radius: 24px !important;
         padding: 10px 20px !important;
         font-weight: 600 !important;
@@ -264,34 +279,35 @@ st.markdown("""
         transition: all 0.2s ease !important;
     }
     .stLinkButton > a:hover {
-        border-color: #1A1A1A !important;
-        background: #1A1A1A !important;
+        border-color: #007AFF !important;
+        background: #007AFF !important;
         color: #FFFFFF !important;
     }
     
-    /* Tabs Styling */
+    /* Tabs Styling (Apple Segmented Control Style) */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: transparent;
-        padding: 4px;
+        gap: 6px;
+        background: rgba(120, 120, 128, 0.08) !important;
+        padding: 5px !important;
+        border-radius: 14px !important;
     }
     .stTabs [data-baseweb="tab"] {
-        background: #F0EDE6 !important;
-        border-radius: 12px !important;
-        padding: 12px 24px !important;
+        background: transparent !important;
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
         font-weight: 600 !important;
         font-size: 0.9rem !important;
-        color: #5C5C5C !important;
+        color: #1D1D1F !important;
         border: none !important;
         transition: all 0.2s ease !important;
     }
     .stTabs [data-baseweb="tab"]:hover {
-        background: #E8E4DC !important;
-        color: #1A1A1A !important;
+        background: rgba(255, 255, 255, 0.4) !important;
     }
     .stTabs [aria-selected="true"] {
-        background: #1A1A1A !important;
-        color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #1D1D1F !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     }
     .stTabs [data-baseweb="tab-highlight"] {
         display: none;
@@ -304,10 +320,10 @@ st.markdown("""
     .stSelectbox [data-baseweb="select"] {
         background: #FFFFFF;
         border-radius: 12px;
-        border: 2px solid #E8E4DC;
+        border: 1px solid rgba(0, 0, 0, 0.15);
     }
     .stSelectbox [data-baseweb="select"]:focus-within {
-        border-color: #1A1A1A;
+        border-color: #007AFF;
     }
     
     /* Radio Buttons */
@@ -318,18 +334,18 @@ st.markdown("""
         background: #FFFFFF;
         padding: 16px 20px;
         border-radius: 12px;
-        border: 2px solid #E8E4DC;
+        border: 1px solid rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
         cursor: pointer;
     }
     .stRadio label:hover {
-        border-color: #C8C4BC;
+        border-color: rgba(0,0,0,0.25);
     }
     
     /* Divider */
     .custom-divider {
         height: 1px;
-        background: linear-gradient(90deg, transparent, #E8E4DC, transparent);
+        background: rgba(0, 0, 0, 0.08);
         margin: 32px 0;
     }
     
@@ -340,26 +356,26 @@ st.markdown("""
     }
     .hero-title {
         font-size: 3.5rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        color: #1A1A1A;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: #1D1D1F;
         margin-bottom: 16px;
         line-height: 1;
     }
     .hero-subtitle {
         font-size: 1.25rem;
-        color: #6A6A6A;
+        color: #86868B;
         font-weight: 400;
         max-width: 600px;
         margin: 0 auto 40px;
-        line-height: 1.6;
+        line-height: 1.55;
     }
     .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(232, 90, 60, 0.1);
-        color: #E85A3C;
+        background: rgba(0, 122, 255, 0.08);
+        color: #007AFF;
         padding: 8px 16px;
         border-radius: 20px;
         font-size: 0.85rem;
@@ -367,76 +383,33 @@ st.markdown("""
         margin-bottom: 24px;
     }
     
-    /* Weather Widget */
+    /* Weather Widget (Apple Weather Dynamic Gradient Vibe) */
     .weather-widget {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(145deg, #5AC8FA 0%, #007AFF 100%);
         border-radius: 16px;
         padding: 20px 24px;
         color: white;
         display: flex;
         align-items: center;
         gap: 16px;
+        box-shadow: 0 4px 15px rgba(0,122,255,0.15);
     }
     .weather-temp {
         font-size: 2.5rem;
-        font-weight: 700;
+        font-weight: 600;
     }
     .weather-info {
         font-size: 0.9rem;
-        opacity: 0.9;
-    }
-    
-    /* Comparison Table */
-    .comparison-row {
-        display: flex;
-        align-items: center;
-        padding: 16px 0;
-        border-bottom: 1px solid #F0EDE6;
-    }
-    .comparison-row:last-child {
-        border-bottom: none;
-    }
-    
-    /* Floating Action */
-    .fab-container {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 1000;
-    }
-    
-    /* Progress Ring */
-    .progress-ring {
-        width: 120px;
-        height: 120px;
-        margin: 0 auto;
-    }
-    
-    /* Smooth Scrolling */
-    html {
-        scroll-behavior: smooth;
-    }
-    
-    /* Animation Keyframes */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    .animate-fade-in {
-        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0.95;
+        font-weight: 500;
     }
     
     /* Map Container */
     .map-container {
         border-radius: 20px;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        border: 1px solid rgba(0, 0, 0, 0.05);
     }
     
     /* Section Headers */
@@ -449,7 +422,7 @@ st.markdown("""
     .section-icon {
         width: 40px;
         height: 40px;
-        background: #F0EDE6;
+        background: rgba(0, 0, 0, 0.04);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -519,7 +492,7 @@ def load_course_data():
             "Maximum intensity training ground. Tests anaerobic thresholds effectively. Builds exceptional lower-body strength."
         ],
         "Cons": [
-            "High bicycle traffic requires constant awareness. Can be crowded on weekends. Limited shade during summer.",
+            "High volume of bicycle traffic requires errors awareness. Can be crowded on weekends. Limited shade during summer.",
             "Heavy pedestrian traffic on weekend evenings. The popular photo spots can cause congestion on the path.",
             "Short loop distance may feel repetitive. Limited amenities compared to major parks.",
             "Steep sections cause sudden heart rate spikes. Requires careful pace management to avoid overexertion.",
@@ -536,40 +509,40 @@ def load_course_data():
         ],
         "Spots": [
             [
-                {"name": "All That's Morning", "name_kr": "세상의모든아침", "tags": "Brunch · Hotel View · Carb Refuel", "map": "[maps.google.com](https://maps.google.com/?q=세상의모든아침+여의도점)", "insta": "[instagram.com](https://www.instagram.com/all_thats_morning/)"},
-                {"name": "Cafe Jinjeongseong", "name_kr": "카페 진정성", "tags": "Milk Tea · Modern · Instagram Hot", "map": "[maps.google.com](https://maps.google.com/?q=카페+진정성+여의도점)", "insta": "[instagram.com](https://www.instagram.com/cafe_jinjungsung/)"}
+                {"name": "더현대 서울 (The Hyundai Seoul)", "name_kr": "세상의모든아침", "tags": "Brunch · Hotel View · Carb Refuel", "map": "https://maps.google.com/?q=세상의모든아침+여의도점", "insta": "https://www.instagram.com/all_thats_morning/"},
+                {"name": "여의도 한강공원 배달존", "name_kr": "카페 진정성", "tags": "Milk Tea · Modern · Instagram Hot", "map": "https://maps.google.com/?q=카페+진정성+여의도점", "insta": "https://www.instagram.com/cafe_jinjungsung/"}
             ],
             [
-                {"name": "Vrewcleans", "name_kr": "뷰클런즈", "tags": "Songlidangil · Wood Interior · Iced Tea", "map": "[maps.google.com](https://maps.google.com/?q=뷰클런즈)", "insta": "[instagram.com](https://www.instagram.com/vrewcleans/)"},
-                {"name": "Knickerbocker Bagel", "name_kr": "니커버커베이글", "tags": "NYC Style · Carb Heaven · Lake View", "map": "[maps.google.com](https://maps.google.com/?q=니커버커베이글+송파점)", "insta": "[instagram.com](https://www.instagram.com/knickerbockerbagel_korea/)"}
+                {"name": "뷰클런즈 (Vrewcleans)", "name_kr": "뷰클런즈", "tags": "Songlidangil · Wood Interior · Iced Tea", "map": "https://maps.google.com/?q=뷰클런즈", "insta": "https://www.instagram.com/vrewcleans/"},
+                {"name": "니커버커베이글 (Knickerbocker Bagel)", "name_kr": "니커버커베이글", "tags": "NYC Style · Carb Heaven · Lake View", "map": "https://maps.google.com/?q=니커버커베이글+송파점", "insta": "https://www.instagram.com/knickerbockerbagel_korea/"}
             ],
             [
-                {"name": "Paris Baguette Local", "name_kr": "파리바게뜨", "tags": "Fresh Sandwich · Protein · Accessible", "map": "[maps.google.com](https://maps.google.com/?q=파리바게뜨)", "insta": "[instagram.com](https://www.instagram.com/parisbaguette_kr/)"},
-                {"name": "Ediya Coffee", "name_kr": "이디야커피", "tags": "Iced Americano · Quick Hydration", "map": "[maps.google.com](https://maps.google.com/?q=이디야커피)", "insta": "[instagram.com](https://www.instagram.com/ediya.coffee/)"}
+                {"name": "파리바게뜨 로컬 스토어", "name_kr": "파리바게뜨", "tags": "Fresh Sandwich · Protein · Accessible", "map": "https://maps.google.com/?q=파리바게뜨", "insta": "https://www.instagram.com/parisbaguette_kr/"},
+                {"name": "이디야커피 공원점", "name_kr": "이디야커피", "tags": "Iced Americano · Quick Hydration", "map": "https://maps.google.com/?q=이디야커피", "insta": "https://www.instagram.com/ediya.coffee/"}
             ],
             [
-                {"name": "101 Namsan Tonkatsu", "name_kr": "101번지 남산돈까스", "tags": "Classic · Protein Refuel · Must-Try", "map": "[maps.google.com](https://maps.google.com/?q=101번지+남산돈까스)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/남산돈까스/)"},
-                {"name": "Yijungsaengup", "name_kr": "이중생업", "tags": "Korean Fusion · Clean Pasta · Date Spot", "map": "[maps.google.com](https://maps.google.com/?q=이중생업+남산)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/남산맛집/)"}
+                {"name": "101번지 남산돈까스 본점", "name_kr": "101번지 남산돈까스", "tags": "Classic · Protein Refuel · Must-Try", "map": "https://maps.google.com/?q=101번지+남산돈까스", "insta": "https://www.instagram.com/explore/tags/남산돈까스/"},
+                {"name": "이중생업 남산", "name_kr": "이중생업", "tags": "Korean Fusion · Clean Pasta · Date Spot", "map": "https://maps.google.com/?q=이중생업+남산", "insta": "https://www.instagram.com/explore/tags/남산맛집/"}
             ],
             [
-                {"name": "Room Service 301", "name_kr": "룸서비스301", "tags": "Forest View · Dessert Cafe · Aesthetic", "map": "[maps.google.com](https://maps.google.com/?q=룸서비스301)", "insta": "[instagram.com](https://www.instagram.com/roomservice301/)"},
-                {"name": "Cattle & Bee", "name_kr": "캐틀앤비", "tags": "Italian Brunch · Terrace · Dogok", "map": "[maps.google.com](https://maps.google.com/?q=캐틀앤비+양재점)", "insta": "[instagram.com](https://www.instagram.com/cattle_bee/)"}
+                {"name": "룸서비스301 (Room Service 301)", "name_kr": "룸서비스301", "tags": "Forest View · Dessert Cafe · Aesthetic", "map": "https://maps.google.com/?q=룸서비스301", "insta": "https://www.instagram.com/roomservice301/"},
+                {"name": "캐틀앤비 (Cattle & Bee)", "name_kr": "캐틀앤비", "tags": "Italian Brunch · Terrace · Dogok", "map": "https://maps.google.com/?q=캐틀앤비+양재점", "insta": "https://www.instagram.com/cattle_bee/"}
             ],
             [
-                {"name": "La Foresta", "name_kr": "라포레스타", "tags": "Pizza & Pasta · Green View · Family", "map": "[maps.google.com](https://maps.google.com/?q=라포레스타)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/라포레스타/)"},
-                {"name": "Dream Forest Museum Cafe", "name_kr": "꿈의숲 미술관 카페", "tags": "Observatory · Smoothie · Culture", "map": "[maps.google.com](https://maps.google.com/?q=북서울꿈의숲)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/북서울꿈의숲/)"}
+                {"name": "라포레스타 (La Foresta)", "name_kr": "라포레스타", "tags": "Pizza & Pasta · Green View · Family", "map": "https://maps.google.com/?q=라포레스타", "insta": "https://www.instagram.com/explore/tags/라포레스타/"},
+                {"name": "꿈의숲 미술관 카페", "name_kr": "꿈의숲 미술관 카페", "tags": "Observatory · Smoothie · Culture", "map": "https://maps.google.com/?q=북서울꿈의숲", "insta": "https://www.instagram.com/explore/tags/북서울꿈의숲/"}
             ],
             [
-                {"name": "H Lounge Seochon", "name_kr": "H라운지", "tags": "Italian · Garden Terrace · Post-Hike", "map": "[maps.google.com](https://maps.google.com/?q=H라운지)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/서촌브런치/)"},
-                {"name": "Staff Picks", "name_kr": "스태픽스", "tags": "Outdoor Terrace · Ginkgo · Runner Haven", "map": "[maps.google.com](https://maps.google.com/?q=스태픽스)", "insta": "[instagram.com](https://www.instagram.com/staffpicks_official/)"}
+                {"name": "H라운지 (H Lounge) 서촌", "name_kr": "H라운지", "tags": "Italian · Garden Terrace · Post-Hike", "map": "https://maps.google.com/?q=H라운지", "insta": "https://www.instagram.com/explore/tags/서촌브런치/"},
+                {"name": "스태픽스 (Staff Picks)", "name_kr": "스태픽스", "tags": "Outdoor Terrace · Ginkgo · Runner Haven", "map": "https://maps.google.com/?q=스태픽스", "insta": "https://www.instagram.com/staffpicks_official/"}
             ],
             [
-                {"name": "Agu Agu Ttukseom", "name_kr": "아구아구", "tags": "Fresh Salad Bowl · Light Meal · Healthy", "map": "[maps.google.com](https://maps.google.com/?q=아구아구+뚝섬)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/뚝섬맛집/)"},
-                {"name": "Riverside Convenience Store", "name_kr": "한강공원 편의점", "tags": "Powerade · Ice Cup · Instant Ramyun", "map": "[maps.google.com](https://maps.google.com/?q=뚝섬한강공원)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/뚝섬한강공원/)"}
+                {"name": "아구아구 (Agu Agu) 뚝섬", "name_kr": "아구아구", "tags": "Fresh Salad Bowl · Light Meal · Healthy", "map": "https://maps.google.com/?q=아구아구+뚝섬", "insta": "https://www.instagram.com/explore/tags/뚝섬맛집/"},
+                {"name": "뚝섬한강공원 편의점", "name_kr": "한강공원 편의점", "tags": "Powerade · Ice Cup · Instant Ramyun", "map": "https://maps.google.com/?q=뚝섬한강공원", "insta": "https://www.instagram.com/explore/tags/뚝섬한강공원/"}
             ],
             [
-                {"name": "Club Espresso", "name_kr": "클럽에스프레소", "tags": "Drip Coffee · Cyclist Haven · Classic", "map": "[maps.google.com](https://maps.google.com/?q=클럽에스프레소)", "insta": "[instagram.com](https://www.instagram.com/clubespresso/)"},
-                {"name": "Gyeyalsa Chicken", "name_kr": "계열사", "tags": "Seoul Top 3 Chicken · Protein Reward", "map": "[maps.google.com](https://maps.google.com/?q=계열사+부암동)", "insta": "[instagram.com](https://www.instagram.com/explore/tags/계열사/)"}
+                {"name": "클럽에스프레소 (Club Espresso)", "name_kr": "클럽에스프레소", "tags": "Drip Coffee · Cyclist Haven · Classic", "map": "https://maps.google.com/?q=클럽에스프레소", "insta": "https://www.instagram.com/clubespresso/"},
+                {"name": "계열사 (Gyeyalsa)", "name_kr": "계열사", "tags": "Seoul Top 3 Chicken · Protein Reward", "map": "https://maps.google.com/?q=계열사+부암동", "insta": "https://www.instagram.com/explore/tags/계열사/"}
             ]
         ],
         "Playlist_Title": [
@@ -582,49 +555,49 @@ def load_course_data():
                         "150-170", "155-175", "160-180"],
         "Playlist_Tracks": [
             [
-                {"title": "Paris in the Rain", "artist": "Lauv", "link": "[youtube.com](https://www.youtube.com/watch?v=kOCkne-Bku4)"},
-                {"title": "ILYSB", "artist": "LANY", "link": "[youtube.com](https://www.youtube.com/watch?v=SSTp0rknOgA)"},
-                {"title": "Youth", "artist": "Troye Sivan", "link": "[youtube.com](https://www.youtube.com/watch?v=XYAghEq5Lfw)"}
+                {"title": "Paris in the Rain", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=kOCkne-Bku4"},
+                {"title": "ILYSB", "artist": "LANY", "link": "https://www.youtube.com/watch?v=SSTp0rknOgA"},
+                {"title": "Youth", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=XYAghEq5Lfw"}
             ],
             [
-                {"title": "Super Far", "artist": "LANY", "link": "[youtube.com](https://www.youtube.com/watch?v=B88Zas_DclM)"},
-                {"title": "Strawberries & Cigarettes", "artist": "Troye Sivan", "link": "[youtube.com](https://www.youtube.com/watch?v=Z3LgC8u_R8Y)"},
-                {"title": "I Like Me Better", "artist": "Lauv", "link": "[youtube.com](https://www.youtube.com/watch?v=BcqxLCWn-CE)"}
+                {"title": "Super Far", "artist": "LANY", "link": "https://www.youtube.com/watch?v=B88Zas_DclM"},
+                {"title": "Strawberries & Cigarettes", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=Z3LgC8u_R8Y"},
+                {"title": "I Like Me Better", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=BcqxLCWn-CE"}
             ],
             [
-                {"title": "Feelings", "artist": "Lauv", "link": "[youtube.com](https://www.youtube.com/watch?v=421w1jR-SgE)"},
-                {"title": "Pink Skies", "artist": "LANY", "link": "[youtube.com](https://www.youtube.com/watch?v=eE7T_I9vInU)"},
-                {"title": "Wild", "artist": "Troye Sivan", "link": "[youtube.com](https://www.youtube.com/watch?v=fdXNNveYOfU)"}
+                {"title": "Feelings", "artist": "Lauv", "link": "https://www.youtube.com/watch?v=421w1jR-SgE"},
+                {"title": "Pink Skies", "artist": "LANY", "link": "https://www.youtube.com/watch?v=eE7T_I9vInU"},
+                {"title": "Wild", "artist": "Troye Sivan", "link": "https://www.youtube.com/watch?v=fdXNNveYOfU"}
             ],
             [
-                {"title": "Attention", "artist": "Charlie Puth", "link": "[youtube.com](https://www.youtube.com/watch?v=nfs8NYg7yQM)"},
-                {"title": "Shivers", "artist": "Ed Sheeran", "link": "[youtube.com](https://www.youtube.com/watch?v=Il0S8BoucSA)"},
-                {"title": "Light Switch", "artist": "Charlie Puth", "link": "[youtube.com](https://www.youtube.com/watch?v=WFsAon_TWPQ)"}
+                {"title": "Attention", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=nfs8NYg7yQM"},
+                {"title": "Shivers", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=Il0S8BoucSA"},
+                {"title": "Light Switch", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=WFsAon_TWPQ"}
             ],
             [
-                {"title": "How Long", "artist": "Charlie Puth", "link": "[youtube.com](https://www.youtube.com/watch?v=TdylllyoV9c)"},
-                {"title": "Unholy", "artist": "Sam Smith", "link": "[youtube.com](https://www.youtube.com/watch?v=Uq9gPaizbe8)"},
-                {"title": "Bad Habits", "artist": "Ed Sheeran", "link": "[youtube.com](https://www.youtube.com/watch?v=orJSJGHjBLI)"}
+                {"title": "How Long", "artist": "Charlie Puth", "link": "https://www.youtube.com/watch?v=TdylllyoV9c"},
+                {"title": "Unholy", "artist": "Sam Smith", "link": "https://www.youtube.com/watch?v=Uq9gPaizbe8"},
+                {"title": "Bad Habits", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=orJSJGHjBLI"}
             ],
             [
-                {"title": "Shape of You", "artist": "Ed Sheeran", "link": "[youtube.com](https://www.youtube.com/watch?v=JGwWNGJdvx8)"},
-                {"title": "Diamonds", "artist": "Sam Smith", "link": "[youtube.com](https://www.youtube.com/watch?v=8RvAKRoDB7o)"},
-                {"title": "Left and Right", "artist": "Charlie Puth ft. Jungkook", "link": "[youtube.com](https://www.youtube.com/watch?v=a7GITgqwDVg)"}
+                {"title": "Shape of You", "artist": "Ed Sheeran", "link": "https://www.youtube.com/watch?v=JGwWNGJdvx8"},
+                {"title": "Diamonds", "artist": "Sam Smith", "link": "https://www.youtube.com/watch?v=8RvAKRoDB7o"},
+                {"title": "Left and Right", "artist": "Charlie Puth ft. Jungkook", "link": "https://www.youtube.com/watch?v=a7GITgqwDVg"}
             ],
             [
-                {"title": "Dynamite", "artist": "BTS", "link": "[youtube.com](https://www.youtube.com/watch?v=gdZLi9oWNZg)"},
-                {"title": "Kill This Love", "artist": "BLACKPINK", "link": "[youtube.com](https://www.youtube.com/watch?v=2S24-y0Ij3Y)"},
-                {"title": "HUMBLE.", "artist": "Kendrick Lamar", "link": "[youtube.com](https://www.youtube.com/watch?v=tvTRZJ-4EyI)"}
+                {"title": "Dynamite", "artist": "BTS", "link": "https://www.youtube.com/watch?v=gdZLi9oWNZg"},
+                {"title": "Kill This Love", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=2S24-y0Ij3Y"},
+                {"title": "HUMBLE.", "artist": "Kendrick Lamar", "link": "https://www.youtube.com/watch?v=tvTRZJ-4EyI"}
             ],
             [
-                {"title": "Pink Venom", "artist": "BLACKPINK", "link": "[youtube.com](https://www.youtube.com/watch?v=glhXCuM_Y7M)"},
-                {"title": "SICKO MODE", "artist": "Travis Scott", "link": "[youtube.com](https://www.youtube.com/watch?v=d-JBBNg8YKs)"},
-                {"title": "MIC Drop", "artist": "BTS (Steve Aoki Remix)", "link": "[youtube.com](https://www.youtube.com/watch?v=kTlv5_i8ICM)"}
+                {"title": "Pink Venom", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=glhXCuM_Y7M"},
+                {"title": "SICKO MODE", "artist": "Travis Scott", "link": "https://www.youtube.com/watch?v=d-JBBNg8YKs"},
+                {"title": "MIC Drop", "artist": "BTS (Steve Aoki Remix)", "link": "https://www.youtube.com/watch?v=kTlv5_i8ICM"}
             ],
             [
-                {"title": "Run BTS", "artist": "BTS", "link": "[youtube.com](https://www.youtube.com/watch?v=9tG70B3DLIY)"},
-                {"title": "How You Like That", "artist": "BLACKPINK", "link": "[youtube.com](https://www.youtube.com/watch?v=ioNng23DkIM)"},
-                {"title": "Lose Yourself", "artist": "Eminem", "link": "[youtube.com](https://www.youtube.com/watch?v=_Yhyp_hXnyU)"}
+                {"title": "Run BTS", "artist": "BTS", "link": "https://www.youtube.com/watch?v=9tG70B3DLIY"},
+                {"title": "How You Like That", "artist": "BLACKPINK", "link": "https://www.youtube.com/watch?v=ioNng23DkIM"},
+                {"title": "Lose Yourself", "artist": "Eminem", "link": "https://www.youtube.com/watch?v=_Yhyp_hXnyU"}
             ]
         ]
     }
@@ -644,7 +617,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5360, 126.9210], [37.5342, 126.9185], [37.5315, 126.9220],
                 [37.5285, 126.9270], [37.5262, 126.9315], [37.5289, 126.9331]
             ],
-            "colors": ["#22C55E"] * 8
+            "colors": ["#34C759"] * 8 # Apple System Green Tint
         },
         1: {  # Seokchon Lake - Mostly flat with slight bridge incline
             "coords": [
@@ -652,7 +625,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5100, 127.0950], [37.5080, 127.0945], [37.5055, 127.0970],
                 [37.5050, 127.1010], [37.5065, 127.1040], [37.5074, 127.1031]
             ],
-            "colors": ["#22C55E", "#22C55E", "#22C55E", "#F59E0B", "#22C55E", "#22C55E", "#22C55E", "#22C55E"]
+            "colors": ["#34C759", "#34C759", "#34C759", "#FF9500", "#34C759", "#34C759", "#34C759", "#34C759"] # Apple Green & Orange
         },
         3: {  # Namsan - Mixed elevation
             "coords": [
@@ -660,7 +633,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5440, 126.9890], [37.5460, 126.9830], [37.5495, 126.9810],
                 [37.5525, 126.9850], [37.5530, 126.9890], [37.5509, 126.9909]
             ],
-            "colors": ["#22C55E", "#F59E0B", "#EF4444", "#F59E0B", "#22C55E", "#22C55E", "#F59E0B", "#EF4444"]
+            "colors": ["#34C759", "#FF9500", "#FF3B30", "#FF9500", "#34C759", "#34C759", "#FF9500", "#FF3B30"] # Apple System Palette
         },
         4: {  # Yangjaecheon - Flat stream path
             "coords": [
@@ -668,7 +641,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5002, 127.0790], [37.4990, 127.0810], [37.4960, 127.0740],
                 [37.4935, 127.0670], [37.4915, 127.0615], [37.4934, 127.0601]
             ],
-            "colors": ["#22C55E"] * 8
+            "colors": ["#34C759"] * 8
         },
         5: {  # Dream Forest - Moderate hills
             "coords": [
@@ -676,7 +649,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.6190, 127.0380], [37.6205, 127.0340], [37.6230, 127.0325],
                 [37.6250, 127.0350], [37.6257, 127.0371]
             ],
-            "colors": ["#F59E0B", "#EF4444", "#EF4444", "#F59E0B", "#22C55E", "#22C55E", "#F59E0B", "#F59E0B"]
+            "colors": ["#FF9500", "#FF3B30", "#FF3B30", "#FF9500", "#34C759", "#34C759", "#FF9500", "#FF9500"]
         },
         6: {  # Inwangsan - Steep trail
             "coords": [
@@ -684,14 +657,13 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [37.5845, 126.9560], [37.5860, 126.9600], [37.5830, 126.9630],
                 [37.5795, 126.9615], [37.5758, 126.9583]
             ],
-            "colors": ["#F59E0B", "#EF4444", "#EF4444", "#EF4444", "#EF4444", "#F59E0B", "#F59E0B", "#F59E0B"]
+            "colors": ["#FF9500", "#FF3B30", "#FF3B30", "#FF3B30", "#FF3B30", "#FF9500", "#FF9500", "#FF9500"]
         }
     }
     
     if course_idx in routes:
         return routes[course_idx]
     else:
-        # Default circular route
         return {
             "coords": [
                 [center_lat, center_lng],
@@ -701,7 +673,7 @@ def get_route_coordinates(center_lat, center_lng, course_idx):
                 [center_lat - 0.001, center_lng + 0.003],
                 [center_lat, center_lng]
             ],
-            "colors": ["#22C55E", "#F59E0B", "#EF4444", "#F59E0B", "#22C55E", "#22C55E"]
+            "colors": ["#34C759", "#FF9500", "#FF3B30", "#FF9500", "#34C759", "#34C759"]
         }
 
 def get_level_badge(level):
@@ -733,7 +705,6 @@ def get_current_weather():
 # 5. PAGE: WELCOME
 # ============================================================
 if st.session_state.page_stage == "welcome":
-    # Hero Section
     st.markdown("""
         <div class="hero-section">
             <div class="hero-badge">✨ Personalized Running Intelligence</div>
@@ -741,12 +712,11 @@ if st.session_state.page_stage == "welcome":
             <div class="hero-subtitle">
                 Discover your perfect running route in Seoul. 
                 AI-powered recommendations based on your fitness level, 
-                complete with terrain analysis and lifestyle integration.
+                complete with real-time terrain analysis and lifestyle integration.
             </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Feature Cards
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -784,7 +754,6 @@ if st.session_state.page_stage == "welcome":
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # CTA Button
     col_left, col_center, col_right = st.columns([1, 1, 1])
     with col_center:
         if st.button("Start Your Journey →", use_container_width=True):
@@ -793,7 +762,6 @@ if st.session_state.page_stage == "welcome":
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Project Info
     st.markdown("""
         <div style="text-align: center; padding: 20px; color: #8A8A8A; font-size: 0.85rem;">
             <strong>Arts and Big Data</strong> · Sungkyunkwan University<br>
@@ -860,7 +828,6 @@ elif st.session_state.page_stage == "survey":
             if user_pace == "Select your pace..." or user_experience == "Select your experience...":
                 st.error("Please complete both questions to continue.")
             else:
-                # Determine level
                 if "Over 7" in user_pace or "Less than 1" in user_experience:
                     st.session_state.user_level = "Beginner"
                 elif "Under 5" in user_pace or "More than 6" in user_experience:
@@ -871,7 +838,6 @@ elif st.session_state.page_stage == "survey":
                 st.session_state.page_stage = "dashboard"
                 st.rerun()
     
-    # Back button
     st.markdown("<br>", unsafe_allow_html=True)
     col_back = st.columns([1, 3, 1])[0]
     with col_back:
@@ -883,7 +849,6 @@ elif st.session_state.page_stage == "survey":
 # 7. PAGE: DASHBOARD
 # ============================================================
 else:
-    # Header with level selector
     header_col1, header_col2, header_col3 = st.columns([2, 1, 1])
     
     with header_col1:
@@ -912,7 +877,6 @@ else:
     
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     
-    # Weather Widget
     weather = get_current_weather()
     st.markdown(f"""
         <div class="weather-widget" style="margin-bottom: 24px;">
@@ -925,31 +889,27 @@ else:
                 <div style="font-size: 1.5rem; font-weight: 700;">{weather['running_score']}</div>
                 <div class="weather-info">Run Score</div>
             </div>
-            <div style="margin-left: 24px; padding-left: 24px; border-left: 1px solid rgba(255,255,255,0.3);">
+            <div style="margin-left: 24px; padding-left: 24px; border-left: 1px solid rgba(255,255,255,0.25);">
                 <div class="weather-info">💧 {weather['humidity']}% humidity</div>
                 <div class="weather-info">💨 {weather['wind']} km/h wind</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
     
-    # Filter courses
     filtered_df = df[df["Level"] == st.session_state.user_level]
     
-    # Course Tabs
     tab_names = [row['Course_Name'] for _, row in filtered_df.iterrows()]
     tabs = st.tabs(tab_names)
     
     for tab_idx, (df_idx, row) in enumerate(filtered_df.iterrows()):
         with tabs[tab_idx]:
-            # Course Header
             st.markdown(f"""
                 <div style="margin-bottom: 24px;">
                     <h2 style="margin-bottom: 4px;">{row['Course_Name']}</h2>
-                    <p style="color: #8A8A8A; font-size: 0.95rem;">{row['Course_Name_KR']}</p>
+                    <p style="color: #86868B; font-size: 0.95rem;">{row['Course_Name_KR']}</p>
                 </div>
             """, unsafe_allow_html=True)
             
-            # Metrics Row
             m1, m2, m3, m4, m5 = st.columns(5)
             
             with m1:
@@ -994,7 +954,6 @@ else:
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Course Details Tags
             tags = [
                 f"🏃 {row['Surface']} Surface",
                 f"🌳 {row['Shade_Level']} Shade",
@@ -1010,48 +969,44 @@ else:
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Pros and Cons
             pros_col, cons_col = st.columns(2)
             
             with pros_col:
                 st.markdown(f"""
-                    <div class="premium-card" style="border-left: 4px solid #22C55E;">
-                        <h3 style="color: #22C55E; margin-bottom: 12px;">✓ Highlights</h3>
+                    <div class="premium-card" style="border-left: 4px solid #34C759;">
+                        <h3 style="color: #34C759; margin-bottom: 12px;">✓ Highlights</h3>
                         <p style="font-size: 0.95rem; line-height: 1.7;">{row['Pros']}</p>
                     </div>
                 """, unsafe_allow_html=True)
             
             with cons_col:
                 st.markdown(f"""
-                    <div class="premium-card" style="border-left: 4px solid #F59E0B;">
-                        <h3 style="color: #F59E0B; margin-bottom: 12px;">⚠ Considerations</h3>
+                    <div class="premium-card" style="border-left: 4px solid #FF9500;">
+                        <h3 style="color: #FF9500; margin-bottom: 12px;">⚠ Considerations</h3>
                         <p style="font-size: 0.95rem; line-height: 1.7;">{row['Cons']}</p>
                     </div>
                 """, unsafe_allow_html=True)
             
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             
-            # Map Section
             st.markdown("""
                 <div class="section-header">
                     <div class="section-icon">🗺️</div>
                     <div>
                         <h3 style="margin: 0;">Route Map</h3>
-                        <p style="margin: 0; font-size: 0.85rem; color: #8A8A8A;">
+                        <p style="margin: 0; font-size: 0.85rem; color: #86868B;">
                             🟢 Flat · 🟡 Moderate · 🔴 Steep
                         </p>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
             
-            # Create Folium map
             m = folium.Map(
                 location=row['Map_Center'],
                 zoom_start=15,
                 tiles="CartoDB positron"
             )
             
-            # Add route
             route_data = get_route_coordinates(row['Map_Center'][0], row['Map_Center'][1], df_idx)
             coords = route_data["coords"]
             colors = route_data["colors"]
@@ -1064,7 +1019,6 @@ else:
                     opacity=0.9
                 ).add_to(m)
             
-            # Add start marker
             folium.Marker(
                 location=row['Map_Center'],
                 popup="Start / Finish",
@@ -1077,7 +1031,6 @@ else:
             
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             
-            # Post-Run Spots
             st.markdown("""
                 <div class="section-header">
                     <div class="section-icon">☕</div>
@@ -1092,26 +1045,25 @@ else:
                     st.markdown(f"""
                         <div class="spot-card">
                             <div class="spot-name">{spot['name']}</div>
-                            <div style="font-size: 0.85rem; color: #6A6A6A; margin-bottom: 8px;">{spot['name_kr']}</div>
+                            <div style="font-size: 0.85rem; color: #86868B; margin-bottom: 8px;">{spot['name_kr']}</div>
                             <div class="spot-tags">{spot['tags']}</div>
                         </div>
                     """, unsafe_allow_html=True)
                     
                     btn_col1, btn_col2 = st.columns(2)
                     with btn_col1:
-                        st.link_button("📍 Maps", spot['map'], use_container_width=True)
+                        st.link_button("🗺️ View on Google Maps", spot['map'], use_container_width=True)
                     with btn_col2:
-                        st.link_button("📸 Instagram", spot['insta'], use_container_width=True)
+                        st.link_button("📸 View on Instagram", spot['insta'], use_container_width=True)
             
             st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
             
-            # Playlist Section
             st.markdown(f"""
                 <div class="section-header">
                     <div class="section-icon">🎵</div>
                     <div>
                         <h3 style="margin: 0;">{row['Playlist_Title']}</h3>
-                        <p style="margin: 0; font-size: 0.85rem; color: #8A8A8A;">
+                        <p style="margin: 0; font-size: 0.85rem; color: #86868B;">
                             {row['Playlist_BPM']} BPM · Optimized for your pace
                         </p>
                     </div>
@@ -1122,7 +1074,7 @@ else:
                 st.markdown(f"""
                     <div class="player-card">
                         <div class="player-artwork">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                                 <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17C6 19.21 7.79 21 10 21C12.21 21 14 19.21 14 17V7H18V3H12Z" fill="#FFFFFF"/>
                             </svg>
                         </div>
@@ -1137,7 +1089,7 @@ else:
     # Footer
     st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
     st.markdown("""
-        <div style="text-align: center; padding: 20px; color: #8A8A8A; font-size: 0.8rem;">
+        <div style="text-align: center; padding: 20px; color: #86868B; font-size: 0.8rem;">
             <strong>Run-Step</strong> v2.0 · Built with Streamlit<br>
             Yeonhu Lee · Sungkyunkwan University · 2024314274
         </div>
