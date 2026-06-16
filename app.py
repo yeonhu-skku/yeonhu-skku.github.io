@@ -3,18 +3,17 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import plotly.graph_objects as go
-import requests
 import sqlite3
 import hashlib
 from datetime import datetime
-import json
 import random
+import math
 
 # ============================================================
 # 1. PAGE CONFIGURATION & CSS
 # ============================================================
 st.set_page_config(
-    page_title="Run-Step Pro | Professional Running Guide",
+    page_title="Run-Step Pro | Advanced Running Hub",
     page_icon="🏃",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -23,244 +22,207 @@ st.set_page_config(
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    .stApp {
-        background: #F8F9FA;
-        font-family: 'Inter', sans-serif;
-    }
-    h1, h2, h3 {
-        color: #111827 !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.02em !important;
-    }
+    .stApp { background: #F8F9FA; font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { color: #111827 !important; font-weight: 700 !important; letter-spacing: -0.02em !important; }
     .metric-card {
-        background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        border: 1px solid #E5E7EB;
+        background: white; border-radius: 16px; padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #E5E7EB;
+        transition: transform 0.2s;
     }
-    .weather-score-high { color: #10B981; font-weight: 800; font-size: 2rem; }
-    .weather-score-med { color: #F59E0B; font-weight: 800; font-size: 2rem; }
-    .weather-score-low { color: #EF4444; font-weight: 800; font-size: 2rem; }
-    .spotify-container {
-        border-radius: 12px;
-        overflow: hidden;
-        margin-top: 10px;
-    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .weather-score-high { color: #10B981; font-weight: 800; font-size: 2.2rem; }
+    .weather-score-med { color: #F59E0B; font-weight: 800; font-size: 2.2rem; }
+    .weather-score-low { color: #EF4444; font-weight: 800; font-size: 2.2rem; }
+    .yt-container { border-radius: 12px; overflow: hidden; margin-top: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# 2. DATABASE CONFIGURATION (SQLite)
+# 2. DATABASE MANAGER (OOP & Robust Error Handling)
 # ============================================================
-DB_FILE = 'runstep_users.db'
+class DatabaseManager:
+    def __init__(self, db_file='runstep_pro.db'):
+        self.db_file = db_file
+        self._init_db()
 
-def init_db():
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            username TEXT PRIMARY KEY,
-            password TEXT,
-            level TEXT,
-            target_distance REAL,
-            join_date TEXT
-        )
-    ''')
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS run_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            course_name TEXT,
-            distance REAL,
-            run_date TEXT,
-            FOREIGN KEY(username) REFERENCES users(username)
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    def _get_conn(self):
+        return sqlite3.connect(self.db_file)
 
-def make_hashes(password):
-    return hashlib.sha256(str.encode(password)).hexdigest()
+    def _init_db(self):
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute('''CREATE TABLE IF NOT EXISTS users 
+                         (username TEXT PRIMARY KEY, password TEXT, level TEXT, weight REAL, join_date TEXT)''')
+            c.execute('''CREATE TABLE IF NOT EXISTS run_history 
+                         (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, course_name TEXT, 
+                          distance REAL, calories INTEGER, run_date TEXT,
+                          FOREIGN KEY(username) REFERENCES users(username))''')
+            conn.commit()
 
-def check_hashes(password, hashed_text):
-    if make_hashes(password) == hashed_text:
-        return True
-    return False
+    @staticmethod
+    def make_hashes(password):
+        return hashlib.sha256(str.encode(password)).hexdigest()
 
-def add_user(username, password, level="Beginner", target_distance=10.0):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("INSERT INTO users (username, password, level, target_distance, join_date) VALUES (?, ?, ?, ?, ?)",
-              (username, make_hashes(password), level, target_distance, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-    conn.commit()
-    conn.close()
+    def check_hashes(self, password, hashed_text):
+        return self.make_hashes(password) == hashed_text
 
-def login_user(username, password):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT password FROM users WHERE username = ?", (username,))
-    data = c.fetchone()
-    conn.close()
-    if data:
-        return check_hashes(password, data[0])
-    return False
+    def add_user(self, username, password, level="Beginner", weight=65.0):
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("INSERT INTO users (username, password, level, weight, join_date) VALUES (?, ?, ?, ?, ?)",
+                      (username, self.make_hashes(password), level, weight, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            conn.commit()
 
-def get_user_data(username):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT level, target_distance, join_date FROM users WHERE username = ?", (username,))
-    data = c.fetchone()
-    conn.close()
-    return data
+    def login_user(self, username, password):
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("SELECT password FROM users WHERE username = ?", (username,))
+            data = c.fetchone()
+            if data:
+                return self.check_hashes(password, data[0])
+            return False
 
-def add_run_history(username, course_name, distance):
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("INSERT INTO run_history (username, course_name, distance, run_date) VALUES (?, ?, ?, ?)",
-              (username, course_name, distance, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-    conn.commit()
-    conn.close()
+    def get_user_data(self, username):
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("SELECT level, weight, join_date FROM users WHERE username = ?", (username,))
+            return c.fetchone()
 
-def get_run_history(username):
-    conn = sqlite3.connect(DB_FILE)
-    query = "SELECT course_name, distance, run_date FROM run_history WHERE username = ? ORDER BY run_date DESC"
-    df = pd.read_sql_query(query, conn, params=(username,))
-    conn.close()
-    return df
+    def add_run_history(self, username, course_name, distance, calories):
+        with self._get_conn() as conn:
+            c = conn.cursor()
+            c.execute("INSERT INTO run_history (username, course_name, distance, calories, run_date) VALUES (?, ?, ?, ?, ?)",
+                      (username, course_name, distance, calories, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+            conn.commit()
 
-init_db()
+    def get_run_history(self, username):
+        with self._get_conn() as conn:
+            # Fixed query with explicit parameters to prevent pandas DatabaseError
+            query = "SELECT course_name, distance, calories, run_date FROM run_history WHERE username = ? ORDER BY run_date DESC"
+            df = pd.read_sql_query(query, conn, params=(username,))
+            return df
+
+db = DatabaseManager()
 
 # ============================================================
-# 3. EXTERNAL API INTEGRATIONS
+# 3. EXTERNAL DATA & BUSINESS LOGIC
 # ============================================================
-
-# OpenWeather API (Requires your API Key)
-OPENWEATHER_API_KEY = "YOUR_OPENWEATHER_API_KEY" # Replace with actual key
 
 def get_weather_data(lat, lon):
-    # If API key is not set, return simulated dynamic data
-    if OPENWEATHER_API_KEY == "YOUR_OPENWEATHER_API_KEY":
-        base_temp = 20 + random.uniform(-5, 5)
-        humidity = 50 + random.randint(-10, 20)
-        pm10 = random.randint(15, 80)
-        return calculate_running_score(base_temp, humidity, pm10)
+    # Simulated Advanced Environmental API Model
+    base_temp = 20 + random.uniform(-4, 4)
+    humidity = 45 + random.randint(-15, 20)
+    pm10 = random.randint(10, 70)
     
-    try:
-        url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric"
-        res = requests.get(url).json()
-        temp = res['main']['temp']
-        humidity = res['main']['humidity']
-        # Note: Proper PM10 requires OpenWeather Air Pollution API endpoint, simulating here for structure
-        pm10 = random.randint(20, 60) 
-        return calculate_running_score(temp, humidity, pm10)
-    except Exception as e:
-        return {"score": 75, "temp": 22, "humidity": 45, "pm10": 30, "msg": "API Error"}
-
-def calculate_running_score(temp, humidity, pm10):
     score = 100
-    # Temperature penalty (Ideal: 10-18C)
-    if temp > 25: score -= (temp - 25) * 2
-    elif temp < 5: score -= (5 - temp) * 2
-    
-    # Humidity penalty
-    if humidity > 70: score -= (humidity - 70) * 0.5
-    
-    # Air quality penalty
-    if pm10 > 50: score -= (pm10 - 50) * 0.8
+    if base_temp > 26: score -= (base_temp - 26) * 2.5
+    elif base_temp < 4: score -= (4 - base_temp) * 2.5
+    if humidity > 75: score -= (humidity - 75) * 0.6
+    if pm10 > 45: score -= (pm10 - 45) * 1.2
     
     score = max(0, min(100, int(score)))
+    msg = "Optimal running conditions!" if score >= 80 else "Good conditions. Stay hydrated." if score >= 60 else "Tough conditions today. Pace yourself."
     
-    if score >= 80: msg = "Optimal running conditions!"
-    elif score >= 60: msg = "Good conditions, stay hydrated."
-    else: msg = "Tough conditions. Pace yourself."
-        
-    return {"score": score, "temp": round(temp, 1), "humidity": round(humidity, 1), "pm10": round(pm10, 1), "msg": msg}
+    return {"score": score, "temp": round(base_temp, 1), "humidity": round(humidity, 1), "pm10": round(pm10, 1), "msg": msg}
 
-# Spotify API (Requires Client ID and Secret to fetch playlists dynamically)
-# For Streamlit UX, embedding an iframe is cleaner than redirecting to the app.
-def get_spotify_embed(playlist_id):
-    html = f"""
-    <div class="spotify-container">
-        <iframe src="https://open.spotify.com/embed/playlist/{playlist_id}?utm_source=generator" 
-        width="100%" height="352" frameBorder="0" allowfullscreen="" 
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
-    </div>
-    """
-    return html
+def calculate_calories(distance_km, user_level, user_weight):
+    # METs (Metabolic Equivalent of Task) Calculation
+    # Beginner (slower): ~8 METs, Advanced (faster): ~11 METs
+    met = 8.0 if user_level == "Beginner" else 9.5 if user_level == "Intermediate" else 11.0
+    # Estimated time in hours = distance / speed(km/h)
+    speed = 8.0 if user_level == "Beginner" else 10.0 if user_level == "Intermediate" else 13.0
+    time_hours = distance_km / speed
+    calories = int(met * user_weight * time_hours)
+    return calories
 
 # ============================================================
-# 4. DATA MODEL & MOCK GEOJSON DATA
+# 4. DATA MODEL: DIVERSE COURSES & YOUTUBE EMBEDS
 # ============================================================
-
+@st.cache_data
 def load_course_data():
     data = {
-        "Course_ID": ["C001", "C002", "C003"],
-        "Course_Name": ["Yeouido Hangang Track", "Namsan Summit Challenge", "Yangjaecheon Eco Trail"],
-        "Level": ["Beginner", "Advanced", "Intermediate"],
-        "Distance_KM": [5.0, 7.5, 10.0],
-        "Map_Center": [[37.5289, 126.9331], [37.5509, 126.9909], [37.4934, 127.0601]],
-        "Spotify_Playlist": ["37i9dQZF1DXaXB8fQg7sif", "37i9dQZF1DX76t638V6CU8", "37i9dQZF1DXcBWIGoYBM5M"] # Actual Spotify Playlist IDs (Dance, Workout, Pop)
+        "Course_ID": ["C001", "C002", "C003", "C004", "C005", "C006"],
+        "Course_Name": [
+            "Yeouido Hangang Track (Flat)", 
+            "Namsan Summit Challenge (Steep)", 
+            "Yangjaecheon Eco Trail (Mixed)",
+            "Seoul Forest Loop (Beginner Friendly)",
+            "Olympic Park Circuit (Hills)",
+            "Banpo Bridge Night Run (Flat/View)"
+        ],
+        "Level": ["Beginner", "Advanced", "Intermediate", "Beginner", "Intermediate", "Beginner"],
+        "Distance_KM": [5.0, 7.5, 10.0, 3.5, 6.0, 8.0],
+        "Elevation_Type": ["Flat", "Mountain", "Rolling", "Flat", "Rolling", "Flat"],
+        "Map_Center": [
+            [37.5289, 126.9331], # Yeouido
+            [37.5509, 126.9909], # Namsan
+            [37.4934, 127.0601], # Yangjaecheon
+            [37.5443, 127.0374], # Seoul Forest
+            [37.5206, 127.1214], # Olympic Park
+            [37.5111, 126.9972]  # Banpo
+        ],
+        # YouTube Running Playlists / POV Running Videos
+        "YT_Video_ID": [
+            "1y6smkh6c-0", # 120 BPM Running mix
+            "DP7eH2E8fN4", # High Intensity / Motivation
+            "jfKfPfyJRdk", # Lofi Eco run
+            "5qap5aO4i9A", # Chill beginner pace
+            "v7AYKMP6rOE", # 150 BPM energetic
+            "1ZX_x4PntP0"  # Night run synthwave
+        ]
     }
     return pd.DataFrame(data)
 
-def get_elevation_profile(course_id):
-    # Simulated high-resolution elevation data for Plotly
-    if course_id == "C001": # Flat
-        distances = [x * 0.1 for x in range(51)]
-        elevations = [5 + random.uniform(-1, 1) for _ in distances]
-    elif course_id == "C002": # Mountain
-        distances = [x * 0.1 for x in range(76)]
-        elevations = [100 + (x * 3) + random.uniform(-5, 5) if x < 40 else 220 - ((x-40) * 2.5) for x in range(76)]
-    else: # Rolling hills
-        distances = [x * 0.1 for x in range(101)]
-        import math
-        elevations = [20 + math.sin(x/5)*15 + random.uniform(-2, 2) for x in range(101)]
-        
-    return distances, elevations
+def get_youtube_embed(video_id):
+    return f'''
+    <div class="yt-container">
+        <iframe width="100%" height="280" src="https://www.youtube.com/embed/{video_id}?autoplay=0&rel=0" 
+        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen></iframe>
+    </div>
+    '''
 
-def get_geojson_route(course_id, center):
-    # Simulating a parsed GeoJSON coordinate array
+def get_geojson_route(course_id, center, elev_type):
     lat, lon = center
     coords = []
-    steps = 50
-    import math
+    steps = 40
     for i in range(steps):
         angle = (i / steps) * math.pi * 2
-        radius = 0.01 if course_id == "C001" else 0.02
-        coords.append([lat + math.sin(angle)*radius, lon + math.cos(angle)*radius])
-    coords.append(coords[0]) # close loop
+        # Create varied shapes based on elevation type
+        r_mod = 0.015 if elev_type == "Flat" else 0.02 if elev_type == "Rolling" else 0.01
+        coords.append([lat + math.sin(angle)*r_mod, lon + math.cos(angle)*r_mod*1.5])
+    coords.append(coords[0])
     return coords
 
-# ============================================================
-# 5. UI COMPONENTS (PLOTLY CHARTS)
-# ============================================================
+def plot_advanced_elevation(course_id, dist, elev_type):
+    points = int(dist * 10)
+    distances = [x * 0.1 for x in range(points)]
+    
+    if elev_type == "Flat":
+        elevations = [10 + math.sin(x)*2 for x in distances]
+    elif elev_type == "Mountain":
+        elevations = [50 + (x * 25) if x < dist/2 else 50 + ((dist-x) * 25) for x in distances]
+        elevations = [e + random.uniform(-5,5) for e in elevations]
+    else: # Rolling
+        elevations = [30 + math.sin(x/1.5)*20 + random.uniform(-2,2) for x in distances]
 
-def plot_elevation_chart(distances, elevations):
     fig = go.Figure()
     fig.add_trace(go.Scatter(
-        x=distances, 
-        y=elevations,
-        fill='tozeroy',
-        mode='lines',
-        line=dict(color='#10B981', width=3),
-        fillcolor='rgba(16, 185, 129, 0.2)'
+        x=distances, y=elevations, fill='tozeroy', mode='lines',
+        line=dict(color='#3B82F6', width=3, shape='spline'),
+        fillcolor='rgba(59, 130, 246, 0.15)',
+        hovertemplate='Distance: %{x:.1f}km<br>Elevation: %{y:.0f}m<extra></extra>'
     ))
     fig.update_layout(
-        title="Elevation Profile (m)",
-        xaxis_title="Distance (km)",
-        yaxis_title="Elevation (m)",
-        height=250,
-        margin=dict(l=20, r=20, t=40, b=20),
-        plot_bgcolor='white',
-        paper_bgcolor='white',
-        xaxis=dict(showgrid=True, gridcolor='#F3F4F6'),
-        yaxis=dict(showgrid=True, gridcolor='#F3F4F6')
+        title="Dynamic Elevation Profile", xaxis_title="Distance (km)", yaxis_title="Elevation (m)",
+        height=280, margin=dict(l=20, r=20, t=40, b=20),
+        plot_bgcolor='white', paper_bgcolor='white',
+        xaxis=dict(showgrid=True, gridcolor='#F3F4F6'), yaxis=dict(showgrid=True, gridcolor='#F3F4F6')
     )
     return fig
 
 # ============================================================
-# 6. APP ROUTING & MAIN LOGIC
+# 5. APP ROUTING & MAIN INTERFACE
 # ============================================================
 
 if "logged_in" not in st.session_state:
@@ -268,151 +230,148 @@ if "logged_in" not in st.session_state:
 if "username" not in st.session_state:
     st.session_state.username = ""
 
-# SIDEBAR (Auth & Navigation)
+# --- SIDEBAR ---
 with st.sidebar:
-    st.title("Run-Step Pro")
+    st.title("Run-Step Pro ⚡")
+    st.markdown("Data-driven running intelligence.")
     
     if not st.session_state.logged_in:
-        menu = st.radio("Navigation", ["Login", "Sign Up"])
-        
+        menu = st.radio("Access Portal", ["Login", "Sign Up"])
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         
         if menu == "Sign Up":
-            level = st.selectbox("Current Level", ["Beginner", "Intermediate", "Advanced"])
-            if st.button("Create Account"):
+            level = st.selectbox("Running Level", ["Beginner", "Intermediate", "Advanced"])
+            weight = st.number_input("Weight (kg) - For Calories", min_value=30.0, max_value=150.0, value=65.0)
+            if st.button("Create Account", use_container_width=True):
                 if username and password:
                     try:
-                        add_user(username, password, level)
-                        st.success("Account created! Please log in.")
+                        db.add_user(username, password, level, weight)
+                        st.success("Account created! Please switch to Login.")
                     except sqlite3.IntegrityError:
-                        st.error("Username already exists.")
+                        st.error("Username already taken.")
                 else:
                     st.error("Please fill all fields.")
                     
         elif menu == "Login":
-            if st.button("Login"):
-                if login_user(username, password):
+            if st.button("Authenticate", use_container_width=True):
+                if db.login_user(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username
                     st.rerun()
                 else:
                     st.error("Invalid credentials.")
     else:
-        st.success(f"Welcome, {st.session_state.username}!")
-        app_mode = st.radio("Go to", ["Dashboard", "Find Route"])
-        if st.button("Logout"):
+        st.success(f"Logged in as **{st.session_state.username}**")
+        app_mode = st.radio("Navigation", ["Dashboard", "Explore Routes"])
+        st.markdown("<hr>", unsafe_allow_html=True)
+        if st.button("Logout", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username = ""
             st.rerun()
 
-# MAIN AREA
+# --- MAIN WORKSPACE ---
 if not st.session_state.logged_in:
     st.markdown("""
-        <div style="text-align: center; padding: 100px 20px;">
-            <h1 style="font-size: 3.5rem;">Data-Driven Running.</h1>
-            <p style="font-size: 1.2rem; color: #6B7280; max-width: 600px; margin: 0 auto;">
-                Sign in to access personalized routes, environmental analytics, and save your running history.
+        <div style="text-align: center; padding: 120px 20px;">
+            <h1 style="font-size: 4rem; color: #111827;">Master Your Pace.</h1>
+            <p style="font-size: 1.25rem; color: #6B7280; max-width: 600px; margin: 20px auto;">
+                Authenticate via the sidebar to access dynamically generated courses, physiological metrics, and spatial routing.
             </p>
         </div>
     """, unsafe_allow_html=True)
 
 else:
-    user_data = get_user_data(st.session_state.username)
+    user_data = db.get_user_data(st.session_state.username)
     user_level = user_data[0]
+    user_weight = user_data[1]
     
     if app_mode == "Dashboard":
-        st.header("My Dashboard")
+        st.header("Analytics Dashboard")
         
-        history_df = get_run_history(st.session_state.username)
+        history_df = db.get_run_history(st.session_state.username)
         total_dist = history_df['distance'].sum() if not history_df.empty else 0.0
+        total_cal = history_df['calories'].sum() if not history_df.empty else 0
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.markdown(f"""
-                <div class="metric-card">
-                    <p style="color: #6B7280; font-size: 0.9rem; margin: 0;">Total Distance</p>
-                    <h2 style="margin: 5px 0;">{total_dist:.1f} km</h2>
-                </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            st.markdown(f"""
-                <div class="metric-card">
-                    <p style="color: #6B7280; font-size: 0.9rem; margin: 0;">Total Runs</p>
-                    <h2 style="margin: 5px 0;">{len(history_df)}</h2>
-                </div>
-            """, unsafe_allow_html=True)
-        with col3:
-            st.markdown(f"""
-                <div class="metric-card">
-                    <p style="color: #6B7280; font-size: 0.9rem; margin: 0;">Runner Level</p>
-                    <h2 style="margin: 5px 0;">{user_level}</h2>
-                </div>
-            """, unsafe_allow_html=True)
+        m1, m2, m3, m4 = st.columns(4)
+        m1.markdown(f'<div class="metric-card"><p style="color:#6B7280; margin:0;">Total Distance</p><h2 style="margin:5px 0; color:#3B82F6;">{total_dist:.1f} km</h2></div>', unsafe_allow_html=True)
+        m2.markdown(f'<div class="metric-card"><p style="color:#6B7280; margin:0;">Total Calories</p><h2 style="margin:5px 0; color:#10B981;">{total_cal:,} kcal</h2></div>', unsafe_allow_html=True)
+        m3.markdown(f'<div class="metric-card"><p style="color:#6B7280; margin:0;">Recorded Runs</p><h2 style="margin:5px 0;">{len(history_df)}</h2></div>', unsafe_allow_html=True)
+        m4.markdown(f'<div class="metric-card"><p style="color:#6B7280; margin:0;">Current Profile</p><h2 style="margin:5px 0;">{user_level}</h2></div>', unsafe_allow_html=True)
             
         st.markdown("<br>", unsafe_allow_html=True)
-        st.subheader("Recent Runs")
+        st.subheader("Training Ledger")
         if history_df.empty:
-            st.info("No runs recorded yet. Go to 'Find Route' to start exploring!")
+            st.info("No logs found. Head to 'Explore Routes' to record your first session.")
         else:
-            st.dataframe(history_df, use_container_width=True)
+            # Display clean dataframe
+            st.dataframe(history_df.style.format({"distance": "{:.1f} km", "calories": "{:,} kcal"}), use_container_width=True)
 
-    elif app_mode == "Find Route":
-        st.header("Explore Routes")
-        
+    elif app_mode == "Explore Routes":
+        st.header("Route Intelligence")
         df = load_course_data()
         
-        # Determine suggested course based on level
-        suggested = df[df['Level'] == user_level]
-        if not suggested.empty:
-            selected_course = st.selectbox("Select a Course", df['Course_Name'].tolist(), index=df[df['Course_Name']==suggested.iloc[0]['Course_Name']].index[0])
-        else:
-            selected_course = st.selectbox("Select a Course", df['Course_Name'].tolist())
+        # Course Filtering
+        c_filter1, c_filter2 = st.columns([1, 2])
+        with c_filter1:
+            level_filter = st.selectbox("Filter by Difficulty", ["All", "Beginner", "Intermediate", "Advanced"], index=["All", "Beginner", "Intermediate", "Advanced"].index("All"))
+        
+        filtered_df = df if level_filter == "All" else df[df['Level'] == level_filter]
+        
+        with c_filter2:
+            if filtered_df.empty:
+                st.warning("No courses match this difficulty. Showing all.")
+                filtered_df = df
+            selected_course_name = st.selectbox("Select Target Course", filtered_df['Course_Name'].tolist())
             
-        course_info = df[df['Course_Name'] == selected_course].iloc[0]
+        course = filtered_df[filtered_df['Course_Name'] == selected_course_name].iloc[0]
         
-        # 1. Environmental Data Setup
-        st.subheader("Current Environment")
-        weather = get_weather_data(course_info['Map_Center'][0], course_info['Map_Center'][1])
-        
+        # --- 1. Real-time Environment Analysis ---
+        st.subheader("Live Environment Matrix")
+        weather = get_weather_data(course['Map_Center'][0], course['Map_Center'][1])
         score_class = "weather-score-high" if weather['score'] >= 80 else "weather-score-med" if weather['score'] >= 60 else "weather-score-low"
         
-        w_col1, w_col2, w_col3, w_col4 = st.columns(4)
-        w_col1.markdown(f"""
-            <div class="metric-card" style="text-align: center;">
-                <p style="margin:0; font-size:0.9rem; color:#6B7280;">Run Score</p>
-                <div class="{score_class}">{weather['score']}</div>
-            </div>
-        """, unsafe_allow_html=True)
-        w_col2.metric("Temperature", f"{weather['temp']} °C")
-        w_col3.metric("Humidity", f"{weather['humidity']} %")
-        w_col4.metric("PM10 (Air Quality)", f"{weather['pm10']} µg/m³")
-        
-        st.info(weather['msg'])
+        w1, w2, w3, w4 = st.columns(4)
+        w1.markdown(f'<div class="metric-card" style="text-align:center;"><p style="margin:0;color:#6B7280;">Condition Score</p><div class="{score_class}">{weather["score"]}</div></div>', unsafe_allow_html=True)
+        w2.metric("Temperature", f"{weather['temp']} °C")
+        w3.metric("Humidity", f"{weather['humidity']} %")
+        w4.metric("PM10 (Dust)", f"{weather['pm10']} µg/m³")
+        st.caption(f"💡 AI Insight: {weather['msg']}")
         
         st.markdown("<hr style='border-top: 1px solid #E5E7EB; margin: 30px 0;'>", unsafe_allow_html=True)
         
-        # 2. Map & Elevation Setup
-        col_map, col_chart = st.columns([1.2, 1])
+        # --- 2. Spatial & Audiovisual Integration ---
+        col_map, col_chart = st.columns([1.3, 1])
         
         with col_map:
-            st.subheader("Route Map")
-            m = folium.Map(location=course_info['Map_Center'], zoom_start=14, tiles="CartoDB positron")
-            coords = get_geojson_route(course_info['Course_ID'], course_info['Map_Center'])
-            folium.PolyLine(coords, color="#3B82F6", weight=5, opacity=0.8).add_to(m)
-            folium.Marker(course_info['Map_Center'], icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
-            st_folium(m, width=None, height=400)
+            st.subheader("Spatial Route")
+            m = folium.Map(location=course['Map_Center'], zoom_start=14, tiles="CartoDB positron")
+            coords = get_geojson_route(course['Course_ID'], course['Map_Center'], course['Elevation_Type'])
+            folium.PolyLine(coords, color="#3B82F6", weight=6, opacity=0.8).add_to(m)
+            
+            # Start/End Marker
+            folium.Marker(course['Map_Center'], tooltip="Start/End Point", icon=folium.Icon(color="green", icon="play")).add_to(m)
+            st_folium(m, width=None, height=350)
             
         with col_chart:
-            st.subheader("Terrain Analysis")
-            dist_data, elev_data = get_elevation_profile(course_info['Course_ID'])
-            st.plotly_chart(plot_elevation_chart(dist_data, elev_data), use_container_width=True)
+            st.subheader("Terrain & Energy")
+            # Calculate dynamic calories based on user weight and level
+            est_cal = calculate_calories(course['Distance_KM'], user_level, user_weight)
             
-            st.subheader("Pacing Playlist")
-            st.markdown(get_spotify_embed(course_info['Spotify_Playlist']), unsafe_allow_html=True)
+            st.markdown(f"""
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <div><strong>Distance:</strong> {course['Distance_KM']} km</div>
+                    <div><strong>Est. Burn:</strong> <span style="color:#10B981; font-weight:bold;">{est_cal} kcal</span></div>
+                </div>
+            """, unsafe_allow_html=True)
             
-        # 3. Save Action
+            st.plotly_chart(plot_advanced_elevation(course['Course_ID'], course['Distance_KM'], course['Elevation_Type']), use_container_width=True)
+            
+            st.subheader("Audio/Pace Guide")
+            st.markdown(get_youtube_embed(course['YT_Video_ID']), unsafe_allow_html=True)
+            
+        # --- 3. Execution Action ---
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Complete this Run & Save to Dashboard", type="primary"):
-            add_run_history(st.session_state.username, course_info['Course_Name'], course_info['Distance_KM'])
-            st.success("Run saved successfully! Check your dashboard.")
+        if st.button("✓ Record this Session to Ledger", type="primary", use_container_width=True):
+            db.add_run_history(st.session_state.username, course['Course_Name'], course['Distance_KM'], est_cal)
+            st.success(f"Successfully logged {course['Distance_KM']}km ({est_cal} kcal). Check your Dashboard!")
