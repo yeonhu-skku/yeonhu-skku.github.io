@@ -592,7 +592,7 @@ def main():
             colour = DIFFICULTY_COLOURS.get(val, "#888")
             return f"color: {colour}; font-weight: 700;"
 
-        styled = display_df.style.applymap(colour_difficulty, subset=["Difficulty"])
+        styled = display_df.style.map(colour_difficulty, subset=["Difficulty"])
         st.dataframe(styled, use_container_width=True, hide_index=True)
 
     # ─────────────────────────────────────────
