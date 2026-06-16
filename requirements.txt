@@ -3,6 +3,3 @@ pandas
 folium
 streamlit-folium
 plotly
-requests
-spotipy
-db-sqlite3
