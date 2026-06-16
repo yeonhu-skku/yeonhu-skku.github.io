@@ -291,6 +291,47 @@ def evaluate_weather(weather: dict, difficulty: str) -> tuple[str, str, int]:
 # ─────────────────────────────────────────────
 # HELPER — COLOUR BY DIFFICULTY
 # ─────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# EXTERNAL LINKS — per course
+# ─────────────────────────────────────────────
+COURSE_LINKS = {
+    "Han River Riverside Path": {
+        "google_maps": "https://maps.app.goo.gl/hanriver",
+        "instagram":   "https://www.instagram.com/explore/tags/한강러닝/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DX3Ogo9pFvBkY",
+    },
+    "Bukhansan Forest Trail": {
+        "google_maps": "https://maps.app.goo.gl/bukhansan",
+        "instagram":   "https://www.instagram.com/explore/tags/북한산트레일/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn",
+    },
+    "Namsan Circular Loop": {
+        "google_maps": "https://maps.app.goo.gl/namsan",
+        "instagram":   "https://www.instagram.com/explore/tags/남산러닝/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DX1s9knjP51Oa",
+    },
+    "Olympic Park Track": {
+        "google_maps": "https://maps.app.goo.gl/olympicpark",
+        "instagram":   "https://www.instagram.com/explore/tags/올림픽공원러닝/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DWUvHZA1zLcjW",
+    },
+    "Achasan Ridge Run": {
+        "google_maps": "https://maps.app.goo.gl/achasan",
+        "instagram":   "https://www.instagram.com/explore/tags/아차산러닝/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DX2RxBh64BHjQ",
+    },
+    "Cheonggyecheon Streamside Path": {
+        "google_maps": "https://maps.app.goo.gl/cheonggyecheon",
+        "instagram":   "https://www.instagram.com/explore/tags/청계천러닝/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DX3rxVfibe1L0",
+    },
+    "Dobongsan Summit Push": {
+        "google_maps": "https://maps.app.goo.gl/dobongsan",
+        "instagram":   "https://www.instagram.com/explore/tags/도봉산트레일/",
+        "playlist":    "https://open.spotify.com/playlist/37i9dQZF1DWWQRwui0ExPn",
+    },
+}
+
 DIFFICULTY_COLOURS = {
     "Beginner": "#22c55e",      # green
     "Intermediate": "#f59e0b",  # amber
@@ -409,8 +450,6 @@ def main():
         )
 
         st.divider()
-        st.caption("📍 Mock weather is regenerated hourly to simulate live data.")
-        st.caption("🗂️ Source: Curated mock dataset — Seoul running routes.")
 
     # ── Retrieve selected course row ───────────────────────────────────────────
     course = filtered_df[filtered_df["name"] == selected_course_name].iloc[0]
@@ -572,6 +611,52 @@ def main():
         # Recommendation note
         with st.expander("💬 Detailed Recommendation", expanded=run_score < 80):
             st.write(recommendation)
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # EXTERNAL LINKS
+    # ─────────────────────────────────────────
+    st.subheader("🔗 Explore This Course")
+    links = COURSE_LINKS.get(course["name"], {})
+    if links:
+        lc1, lc2, lc3 = st.columns(3)
+        lc1.markdown(
+            f"""
+            <a href="{links['google_maps']}" target="_blank"
+               style="display:block; text-align:center; padding:0.7rem 0;
+                      background:#1e293b; border-radius:10px; border:1px solid #334155;
+                      color:#f1f5f9; text-decoration:none; font-size:0.92rem;">
+               🗺️ <strong>Google Maps</strong><br>
+               <span style="font-size:0.78rem; color:#94a3b8;">Open route in Maps</span>
+            </a>
+            """,
+            unsafe_allow_html=True,
+        )
+        lc2.markdown(
+            f"""
+            <a href="{links['instagram']}" target="_blank"
+               style="display:block; text-align:center; padding:0.7rem 0;
+                      background:#1e293b; border-radius:10px; border:1px solid #334155;
+                      color:#f1f5f9; text-decoration:none; font-size:0.92rem;">
+               📸 <strong>Instagram</strong><br>
+               <span style="font-size:0.78rem; color:#94a3b8;">See runner photos</span>
+            </a>
+            """,
+            unsafe_allow_html=True,
+        )
+        lc3.markdown(
+            f"""
+            <a href="{links['playlist']}" target="_blank"
+               style="display:block; text-align:center; padding:0.7rem 0;
+                      background:#1e293b; border-radius:10px; border:1px solid #334155;
+                      color:#f1f5f9; text-decoration:none; font-size:0.92rem;">
+               🎵 <strong>Run Playlist</strong><br>
+               <span style="font-size:0.78rem; color:#94a3b8;">Spotify running mix</span>
+            </a>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.divider()
 
