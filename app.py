@@ -1,416 +1,652 @@
+"""
+Running Course Analyzer — app.py
+=================================
+A Streamlit web application that analyzes running courses based on terrain,
+mock weather conditions, and calculated difficulty levels.
+
+Run locally:
+    pip install -r requirements.txt
+    streamlit run app.py
+"""
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import plotly.express as px
+import random
 
-# ── Page config ──────────────────────────────────────────
+# ─────────────────────────────────────────────
+# PAGE CONFIG  (must be the first Streamlit call)
+# ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="STRIDEMAP · Running Course Analysis",
+    page_title="Running Course Analyzer",
     page_icon="🏃",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-st.markdown("""
-<style>
-    .main { background-color: #0a0a0f; }
-    h1 { color: #ff4d5a; }
-</style>
-""", unsafe_allow_html=True)
-
-# ── Data ─────────────────────────────────────────────────
+# ─────────────────────────────────────────────
+# MOCK DATA — COURSES
+# ─────────────────────────────────────────────
 @st.cache_data
-def load_data():
-    data = {
-        "title":         ["Han River Morning", "Bukhansan Trail", "Gangnam Loop",
-                          "Olympic Park Sunrise", "Cheonggyecheon Stream", "Mapo Valentine Run",
-                          "Yeouido Cherry Prep", "Namsan Night Climb", "Han River Spring",
-                          "Songpa Riverside", "Bukhan Spring Trail", "Night City Sprint"],
-        "date":          ["2024-01-15","2024-01-18","2024-01-22","2024-02-02","2024-02-08",
-                          "2024-02-14","2024-02-20","2024-03-05","2024-03-15","2024-03-22",
-                          "2024-04-05","2024-04-18"],
-        "terrain_type":  ["Riverside","Mountain","Urban","Park","Urban",
-                          "Urban","Riverside","Mountain","Riverside","Riverside","Mountain","Urban"],
-        "distance_km":   [8.4, 12.1, 6.2, 9.8, 7.6, 10.5, 5.0, 11.2, 15.3, 13.7, 14.8, 4.5],
-        "duration_min":  [52, 89, 38, 61, 46, 65, 31, 78, 95, 84, 108, 26],
-        "avg_pace_sec":  [371, 441, 368, 373, 362, 371, 372, 418, 372, 368, 437, 347],
-        "avg_hr":        [148, 162, 142, 151, 145, 155, 138, 168, 152, 149, 165, 168],
-        "max_hr":        [172, 185, 162, 175, 168, 178, 158, 188, 172, 170, 190, 188],
-        "calories":      [610, 980, 445, 720, 548, 775, 358, 892, 1102, 985, 1220, 342],
-        "elevation_m":   [12, 420, 8, 45, 5, 62, 4, 265, 18, 22, 510, 10],
-        "max_slope_pct": [3, 28, 2, 8, 1, 12, 1, 22, 4, 5, 32, 3],
-        "surface":       ["Asphalt","Trail","Asphalt","Mixed","Asphalt",
-                          "Asphalt","Asphalt","Trail","Asphalt","Asphalt","Trail","Asphalt"],
-        "weather":       ["Clear","Cloudy","Sunny","Clear","Foggy","Clear",
-                          "Windy","Clear","Sunny","Partly Cloudy","Clear","Clear"],
-        "wind_speed_ms": [2, 5, 3, 1, 2, 3, 8, 1, 4, 3, 2, 1],
-        "temp_c":        [3, 1, 6, -2, 4, 8, 10, 12, 18, 15, 14, 17],
-        "mood":          [5, 4, 5, 5, 3, 5, 4, 5, 5, 4, 5, 5],
-        # Elevation series (normalized to 20 points each)
-        "elev_series":   [
-            [8,9,10,11,12,12,11,10,9,9,10,11,12,11,10,9,8,8,9,8],
-            [80,120,165,210,255,295,335,370,398,415,420,418,410,395,375,350,318,280,235,185],
-            [25,26,27,28,28,27,26,25,25,26,27,28,27,26,25,25,25,26,25,25],
-            [15,18,22,28,35,42,45,44,40,35,30,25,22,20,18,17,16,15,16,15],
-            [12,12,11,11,10,10,10,11,11,12,12,11,11,10,10,10,10,11,10,10],
-            [20,25,32,40,48,55,60,62,62,60,58,55,50,45,40,35,30,25,22,20],
-            [5,5,6,6,6,5,5,4,4,4,5,5,6,5,4,4,5,5,4,4],
-            [60,88,118,148,178,205,228,248,262,265,262,255,242,228,210,188,165,138,110,82],
-            [8,9,10,11,12,13,14,15,16,18,17,16,15,14,13,12,11,10,9,8],
-            [12,14,16,18,20,22,22,21,20,18,16,15,14,13,12,12,13,14,13,12],
-            [85,135,188,242,295,345,390,428,460,485,505,510,505,492,475,455,432,405,372,338],
-            [18,20,22,24,25,25,24,22,20,18,19,20,22,23,24,23,21,20,19,18],
-        ],
-    }
-    df = pd.DataFrame(data)
-    df["date"]     = pd.to_datetime(df["date"])
-    df["month"]    = df["date"].dt.strftime("%Y-%m")
-    df["pace_min"] = df["avg_pace_sec"] / 60
-    df["pace_str"] = df["avg_pace_sec"].apply(lambda s: f"{int(s//60)}:{int(s%60):02d}")
-
-    # Difficulty score: weighted combo of elevation, slope, distance
-    elev_n  = df["elevation_m"]   / df["elevation_m"].max()
-    slope_n = df["max_slope_pct"] / df["max_slope_pct"].max()
-    dist_n  = df["distance_km"]   / df["distance_km"].max()
-    df["difficulty_score"] = (elev_n * 0.45 + slope_n * 0.35 + dist_n * 0.20) * 100
-    df["difficulty"] = pd.cut(
-        df["difficulty_score"],
-        bins=[0, 20, 50, 101],
-        labels=["Easy", "Moderate", "Hard"]
-    )
-
-    # Weather impact score: wind + fog penalty on pace vs avg
-    avg_pace = df["avg_pace_sec"].mean()
-    df["weather_impact"] = ((df["avg_pace_sec"] - avg_pace) / avg_pace * 100).round(1)
-
-    return df
-
-df = load_data()
-
-# ── Header ───────────────────────────────────────────────
-st.title("🏃 STRIDEMAP")
-st.markdown("**Art & Big Data** · Seoul Running Course Terrain Analysis 2024")
-st.divider()
-
-# ── Summary metrics ──────────────────────────────────────
-c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("Total Runs",       f"{len(df)}")
-c2.metric("Total Distance",   f"{df['distance_km'].sum():.1f} km")
-c3.metric("Total Elevation",  f"{df['elevation_m'].sum()} m")
-c4.metric("Hardest Course",   df[df["difficulty_score"]==df["difficulty_score"].max()]["title"].values[0])
-c5.metric("Easiest Course",   df[df["difficulty_score"]==df["difficulty_score"].min()]["title"].values[0])
-st.divider()
-
-# ── Sidebar filters ──────────────────────────────────────
-st.sidebar.header("🔍 Filters")
-terrain_filter = st.sidebar.multiselect(
-    "Terrain Type",
-    options=df["terrain_type"].unique(),
-    default=df["terrain_type"].unique()
-)
-difficulty_filter = st.sidebar.multiselect(
-    "Difficulty",
-    options=["Easy", "Moderate", "Hard"],
-    default=["Easy", "Moderate", "Hard"]
-)
-surface_filter = st.sidebar.multiselect(
-    "Surface",
-    options=df["surface"].unique(),
-    default=df["surface"].unique()
-)
-
-filtered = df[
-    df["terrain_type"].isin(terrain_filter) &
-    df["difficulty"].isin(difficulty_filter) &
-    df["surface"].isin(surface_filter)
-]
-st.sidebar.markdown(f"Showing **{len(filtered)}** runs")
-
-# ── Tabs ─────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
-    "🏔 Elevation Profile",
-    "📊 Difficulty Analysis",
-    "🌤 Weather Impact",
-    "📋 Data Table"
-])
-
-# ════════════════════════════════════════════════
-# TAB 1 — Elevation Profile
-# ════════════════════════════════════════════════
-with tab1:
-    st.subheader("Elevation Profile by Course")
-
-    # Course selector
-    selected_courses = st.multiselect(
-        "Select courses to compare",
-        options=filtered["title"].tolist(),
-        default=filtered["title"].tolist()[:4]
-    )
-
-    if selected_courses:
-        fig_elev = go.Figure()
-        colors = ["#00e5ff","#ff4d5a","#ffd166","#9b5de5","#06d6a0",
-                  "#ff9f1c","#e71d36","#2ec4b6","#cbf3f0","#ffbf69","#ffffff","#a8dadc"]
-
-        for i, title in enumerate(selected_courses):
-            row    = filtered[filtered["title"] == title].iloc[0]
-            series = row["elev_series"]
-            x_pct  = [round(j / (len(series)-1) * 100, 1) for j in range(len(series))]
-
-            fig_elev.add_trace(go.Scatter(
-                x=x_pct, y=series,
-                mode="lines",
-                name=f"{title} ({row['elevation_m']}m gain)",
-                line=dict(color=colors[i % len(colors)], width=2.5),
-                fill="tozeroy",
-                fillcolor=colors[i % len(colors)].replace("#","rgba(").rstrip(")") + ",0.06)"
-                    if colors[i % len(colors)].startswith("#") else colors[i % len(colors)],
-                hovertemplate=f"<b>{title}</b><br>Progress: %{{x}}%<br>Elevation: %{{y}}m<extra></extra>"
-            ))
-
-        fig_elev.update_layout(
-            paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-            font_color="#8888a0", legend=dict(bgcolor="#1e1e28"),
-            xaxis_title="Course Progress (%)",
-            yaxis_title="Elevation (m)",
-            hovermode="x unified",
-            margin=dict(t=10)
-        )
-        fig_elev.update_xaxes(gridcolor="#2a2a38")
-        fig_elev.update_yaxes(gridcolor="#2a2a38")
-        st.plotly_chart(fig_elev, use_container_width=True)
-    else:
-        st.info("Select at least one course above.")
-
-    # Elevation gain comparison bar
-    st.subheader("Elevation Gain per Course")
-    elev_sorted = filtered.sort_values("elevation_m", ascending=True)
-    fig_bar = px.bar(
-        elev_sorted, x="elevation_m", y="title",
-        orientation="h",
-        color="elevation_m",
-        color_continuous_scale=["#06d6a0","#9b5de5","#ffd166","#ff4d5a"],
-        labels={"elevation_m": "Elevation Gain (m)", "title": ""},
-        text="elevation_m"
-    )
-    fig_bar.update_traces(texttemplate="%{text}m", textposition="outside")
-    fig_bar.update_layout(
-        paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-        font_color="#8888a0", showlegend=False,
-        coloraxis_showscale=False, margin=dict(t=10)
-    )
-    fig_bar.update_xaxes(gridcolor="#2a2a38")
-    st.plotly_chart(fig_bar, use_container_width=True)
-
-# ════════════════════════════════════════════════
-# TAB 2 — Difficulty Analysis
-# ════════════════════════════════════════════════
-with tab2:
-    col_a, col_b = st.columns(2)
-
-    # Difficulty classification
-    with col_a:
-        st.subheader("Course Difficulty Classification")
-        diff_counts = filtered["difficulty"].value_counts().reset_index()
-        diff_counts.columns = ["Difficulty", "Count"]
-        fig_diff = px.pie(
-            diff_counts, values="Count", names="Difficulty",
-            hole=0.55,
-            color="Difficulty",
-            color_discrete_map={"Easy":"#06d6a0","Moderate":"#ffd166","Hard":"#ff4d5a"}
-        )
-        fig_diff.update_layout(
-            paper_bgcolor="#1e1e28", font_color="#8888a0",
-            legend=dict(bgcolor="#1e1e28"), margin=dict(t=10)
-        )
-        st.plotly_chart(fig_diff, use_container_width=True)
-
-    # Terrain type vs avg difficulty
-    with col_b:
-        st.subheader("Avg Difficulty Score by Terrain")
-        terrain_diff = filtered.groupby("terrain_type").agg(
-            avg_difficulty=("difficulty_score","mean"),
-            avg_elevation=("elevation_m","mean"),
-            count=("title","count")
-        ).reset_index()
-        fig_td = px.bar(
-            terrain_diff, x="terrain_type", y="avg_difficulty",
-            color="terrain_type",
-            text="count",
-            labels={"terrain_type":"Terrain","avg_difficulty":"Avg Difficulty Score (0–100)"},
-            color_discrete_map={"Mountain":"#ff4d5a","Riverside":"#00e5ff",
-                                "Urban":"#9b5de5","Park":"#06d6a0"}
-        )
-        fig_td.update_traces(texttemplate="%{text} runs", textposition="outside")
-        fig_td.update_layout(
-            paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-            font_color="#8888a0", showlegend=False, margin=dict(t=10)
-        )
-        fig_td.update_yaxes(gridcolor="#2a2a38")
-        st.plotly_chart(fig_td, use_container_width=True)
-
-    # Difficulty score vs Pace scatter — manual trendline (no scipy needed)
-    st.subheader("Difficulty Score vs Pace")
-    x_vals = filtered["difficulty_score"].values
-    y_vals = filtered["pace_min"].values
-
-    # Manual linear regression
-    if len(x_vals) > 1:
-        m, b   = np.polyfit(x_vals, y_vals, 1)
-        x_line = np.linspace(x_vals.min(), x_vals.max(), 100)
-        y_line = m * x_line + b
-    else:
-        x_line, y_line = [], []
-
-    diff_colors = {"Easy":"#06d6a0","Moderate":"#ffd166","Hard":"#ff4d5a"}
-    fig_dp = go.Figure()
-
-    for diff_label, color in diff_colors.items():
-        sub = filtered[filtered["difficulty"] == diff_label]
-        fig_dp.add_trace(go.Scatter(
-            x=sub["difficulty_score"], y=sub["pace_min"],
-            mode="markers",
-            name=diff_label,
-            marker=dict(color=color, size=12, line=dict(color="#1e1e28", width=1)),
-            text=sub["title"],
-            hovertemplate="<b>%{text}</b><br>Difficulty: %{x:.1f}<br>Pace: %{y:.2f} min/km<extra></extra>"
-        ))
-
-    if len(x_line):
-        fig_dp.add_trace(go.Scatter(
-            x=x_line, y=y_line,
-            mode="lines", name="Trend",
-            line=dict(color="rgba(255,255,255,0.25)", width=1.5, dash="dot")
-        ))
-
-    fig_dp.update_layout(
-        paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-        font_color="#8888a0", legend=dict(bgcolor="#1e1e28"),
-        xaxis_title="Difficulty Score (0–100)",
-        yaxis_title="Avg Pace (min/km)",
-        margin=dict(t=10)
-    )
-    fig_dp.update_xaxes(gridcolor="#2a2a38")
-    fig_dp.update_yaxes(gridcolor="#2a2a38")
-    st.plotly_chart(fig_dp, use_container_width=True)
-
-    # Course difficulty scorecard
-    st.subheader("Course Difficulty Scorecard")
-    scorecard = filtered[["title","terrain_type","surface","distance_km",
-                           "elevation_m","max_slope_pct","difficulty_score","difficulty"]].copy()
-    scorecard.columns = ["Course","Terrain","Surface","Distance (km)",
-                         "Elevation (m)","Max Slope (%)","Difficulty Score","Level"]
-    scorecard["Difficulty Score"] = scorecard["Difficulty Score"].round(1)
-    scorecard = scorecard.sort_values("Difficulty Score", ascending=False)
-    st.dataframe(scorecard, use_container_width=True, hide_index=True)
-
-# ════════════════════════════════════════════════
-# TAB 3 — Weather Impact
-# ════════════════════════════════════════════════
-with tab3:
-    st.subheader("How Much Does Weather Affect Each Course?")
-    st.caption("Weather Impact = % deviation from average pace. Positive = slower than average.")
-
-    col_a, col_b = st.columns(2)
-
-    # Weather impact per course
-    with col_a:
-        impact_sorted = filtered.sort_values("weather_impact", ascending=True)
-        fig_wi = px.bar(
-            impact_sorted, x="weather_impact", y="title",
-            orientation="h",
-            color="weather_impact",
-            color_continuous_scale=["#06d6a0","#ffd166","#ff4d5a"],
-            labels={"weather_impact": "Pace Deviation from Avg (%)", "title": ""},
-            text="weather"
-        )
-        fig_wi.update_traces(textposition="outside")
-        fig_wi.update_layout(
-            paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-            font_color="#8888a0", showlegend=False,
-            coloraxis_showscale=False, margin=dict(t=10)
-        )
-        fig_wi.update_xaxes(gridcolor="#2a2a38", zeroline=True, zerolinecolor="#4a4a60")
-        st.plotly_chart(fig_wi, use_container_width=True)
-
-    # Wind speed vs pace deviation
-    with col_b:
-        st.subheader("Wind Speed vs Pace Impact")
-        fig_wind = go.Figure()
-        terrain_colors = {"Mountain":"#ff4d5a","Riverside":"#00e5ff",
-                          "Urban":"#9b5de5","Park":"#06d6a0"}
-        for terrain, color in terrain_colors.items():
-            sub = filtered[filtered["terrain_type"] == terrain]
-            if sub.empty:
-                continue
-            fig_wind.add_trace(go.Scatter(
-                x=sub["wind_speed_ms"], y=sub["weather_impact"],
-                mode="markers",
-                name=terrain,
-                marker=dict(color=color, size=11, line=dict(color="#1e1e28",width=1)),
-                text=sub["title"],
-                hovertemplate="<b>%{text}</b><br>Wind: %{x} m/s<br>Pace impact: %{y}%<extra></extra>"
-            ))
-
-        # Manual trendline
-        wx = filtered["wind_speed_ms"].values
-        wy = filtered["weather_impact"].values
-        if len(wx) > 1:
-            mw, bw   = np.polyfit(wx, wy, 1)
-            xl = np.linspace(wx.min(), wx.max(), 100)
-            fig_wind.add_trace(go.Scatter(
-                x=xl, y=mw*xl+bw,
-                mode="lines", name="Trend",
-                line=dict(color="rgba(255,255,255,0.2)", width=1.5, dash="dot")
-            ))
-
-        fig_wind.update_layout(
-            paper_bgcolor="#1e1e28", plot_bgcolor="#1e1e28",
-            font_color="#8888a0", legend=dict(bgcolor="#1e1e28"),
-            xaxis_title="Wind Speed (m/s)",
-            yaxis_title="Pace Deviation (%)",
-            margin=dict(t=10)
-        )
-        fig_wind.update_xaxes(gridcolor="#2a2a38")
-        fig_wind.update_yaxes(gridcolor="#2a2a38", zeroline=True, zerolinecolor="#4a4a60")
-        st.plotly_chart(fig_wind, use_container_width=True)
-
-    # Weather condition summary table
-    st.subheader("Weather Condition Summary")
-    weather_summary = filtered.groupby("weather").agg(
-        runs=("title","count"),
-        avg_pace=("pace_min","mean"),
-        avg_wind=("wind_speed_ms","mean"),
-        avg_temp=("temp_c","mean"),
-        avg_impact=("weather_impact","mean")
-    ).reset_index()
-    weather_summary.columns = ["Weather","Runs","Avg Pace (min/km)","Avg Wind (m/s)","Avg Temp (°C)","Avg Pace Impact (%)"]
-    weather_summary = weather_summary.round(2)
-    st.dataframe(weather_summary, use_container_width=True, hide_index=True)
-
-# ════════════════════════════════════════════════
-# TAB 4 — Data Table
-# ════════════════════════════════════════════════
-with tab4:
-    st.subheader("Full Running Log")
-    display_df = filtered[[
-        "date","title","terrain_type","surface","distance_km","duration_min",
-        "pace_str","avg_hr","calories","elevation_m","max_slope_pct","difficulty","weather","temp_c"
-    ]].copy()
-    display_df.columns = [
-        "Date","Course","Terrain","Surface","Distance (km)","Duration (min)",
-        "Pace","Avg HR","Calories","Elevation (m)","Max Slope (%)","Difficulty","Weather","Temp (°C)"
+def load_course_data() -> pd.DataFrame:
+    """
+    Returns a DataFrame of predefined running courses with metadata.
+    Uses @st.cache_data so it is computed only once per session.
+    """
+    courses = [
+        {
+            "name": "Han River Riverside Path",
+            "location": "Seoul, Yeouido",
+            "distance_km": 7.2,
+            "elevation_gain_m": 18,
+            "surface": "Asphalt / Cycle Path",
+            "difficulty": "Beginner",
+            "avg_time_min": 43,
+            "description": (
+                "A flat, scenic loop along the Han River. "
+                "Perfect for beginners or easy recovery runs. "
+                "Well-lit and open year-round."
+            ),
+        },
+        {
+            "name": "Bukhansan Forest Trail",
+            "location": "Seoul, Dobonggu",
+            "distance_km": 12.5,
+            "elevation_gain_m": 680,
+            "surface": "Dirt Trail / Rock",
+            "difficulty": "Advanced",
+            "avg_time_min": 110,
+            "description": (
+                "A challenging mountain trail inside Bukhansan National Park. "
+                "Technical rocky sections demand trail shoes and careful footing."
+            ),
+        },
+        {
+            "name": "Namsan Circular Loop",
+            "location": "Seoul, Yongsan",
+            "distance_km": 5.8,
+            "elevation_gain_m": 195,
+            "surface": "Paved Road / Dirt",
+            "difficulty": "Intermediate",
+            "avg_time_min": 52,
+            "description": (
+                "A popular loop circumnavigating Namsan (N Seoul Tower). "
+                "Moderate climb with panoramic city views at the summit."
+            ),
+        },
+        {
+            "name": "Olympic Park Track",
+            "location": "Seoul, Songpa",
+            "distance_km": 3.0,
+            "elevation_gain_m": 5,
+            "surface": "Urethane Track",
+            "difficulty": "Beginner",
+            "avg_time_min": 18,
+            "description": (
+                "A smooth 400 m urethane track inside Olympic Park. "
+                "Ideal for interval training and easy on the joints."
+            ),
+        },
+        {
+            "name": "Achasan Ridge Run",
+            "location": "Seoul, Gwangjin",
+            "distance_km": 8.9,
+            "elevation_gain_m": 320,
+            "surface": "Dirt Trail / Wooden Boardwalk",
+            "difficulty": "Intermediate",
+            "avg_time_min": 75,
+            "description": (
+                "A scenic ridge trail in eastern Seoul with city skyline views. "
+                "Wooden boardwalks on steeper sections keep the descent manageable."
+            ),
+        },
+        {
+            "name": "Cheonggyecheon Streamside Path",
+            "location": "Seoul, Jongno",
+            "distance_km": 5.4,
+            "elevation_gain_m": 8,
+            "surface": "Concrete / Stone",
+            "difficulty": "Beginner",
+            "avg_time_min": 32,
+            "description": (
+                "A cool, shaded urban run along the restored Cheonggyecheon Stream. "
+                "Flat and refreshing — ideal for hot summer days."
+            ),
+        },
+        {
+            "name": "Dobongsan Summit Push",
+            "location": "Seoul, Dobong",
+            "distance_km": 15.3,
+            "elevation_gain_m": 890,
+            "surface": "Rock / Dirt Trail",
+            "difficulty": "Advanced",
+            "avg_time_min": 145,
+            "description": (
+                "One of the toughest routes in Seoul, ascending to Dobongsan's "
+                "granite peaks. Serious scrambling required near the top."
+            ),
+        },
     ]
-    display_df["Date"] = display_df["Date"].dt.strftime("%Y-%m-%d")
-    st.dataframe(display_df, use_container_width=True, hide_index=True, height=440)
+    return pd.DataFrame(courses)
 
-    st.subheader("Descriptive Statistics")
-    stats_df = filtered[["distance_km","pace_min","avg_hr","elevation_m","max_slope_pct","difficulty_score"]].describe().round(2)
-    stats_df.index   = ["Count","Mean","Std Dev","Min","25%","Median","75%","Max"]
-    stats_df.columns = ["Distance (km)","Pace (min/km)","Avg HR","Elevation (m)","Max Slope (%)","Difficulty Score"]
-    st.dataframe(stats_df, use_container_width=True)
 
-# ── Footer ───────────────────────────────────────────────
-st.divider()
-st.caption("STRIDEMAP · Art & Big Data · Seoul Running Course Analysis 2024")
+# ─────────────────────────────────────────────
+# MOCK DATA — ELEVATION PROFILES
+# ─────────────────────────────────────────────
+@st.cache_data
+def generate_elevation_profile(course_name: str, distance_km: float, elevation_gain_m: int) -> pd.DataFrame:
+    """
+    Generates a plausible synthetic elevation profile for a given course.
+
+    Args:
+        course_name:     Used as the random seed so the profile is reproducible.
+        distance_km:     Total course distance (determines number of data points).
+        elevation_gain_m: Peak elevation gain drives the amplitude of the curve.
+
+    Returns:
+        A DataFrame with columns ['distance_km', 'elevation_m'].
+    """
+    # Seed with a hash of the name so each course gets a unique but stable profile
+    seed = abs(hash(course_name)) % (2**31)
+    rng = np.random.default_rng(seed)
+
+    n_points = max(30, int(distance_km * 10))  # ~10 points per km
+    x = np.linspace(0, distance_km, n_points)
+
+    # Build a smooth elevation curve: sine wave + noise, normalised to target gain
+    raw = (
+        np.sin(np.linspace(0, 3 * np.pi, n_points)) * 0.6
+        + np.sin(np.linspace(0, 7 * np.pi, n_points)) * 0.25
+        + rng.normal(0, 0.1, n_points)
+    )
+    raw -= raw.min()
+    if raw.max() > 0:
+        raw = raw / raw.max()
+
+    base_elevation = 30  # metres above sea level (approximate Seoul floor)
+    elevation = base_elevation + raw * elevation_gain_m
+
+    return pd.DataFrame({"distance_km": x, "elevation_m": elevation})
+
+
+# ─────────────────────────────────────────────
+# MOCK DATA — WEATHER
+# ─────────────────────────────────────────────
+@st.cache_data(ttl=300)  # Refresh weather every 5 minutes to simulate live data
+def get_mock_weather(location: str) -> dict:
+    """
+    Returns mock current weather for a given location.
+    In a production app, replace this with a real API call
+    (e.g., OpenWeatherMap: https://openweathermap.org/api).
+
+    Args:
+        location: Location string used as seed for reproducible mock data.
+
+    Returns:
+        A dict with temperature, humidity, wind_speed, condition, and icon.
+    """
+    seed = abs(hash(location + str(pd.Timestamp.now().hour))) % (2**31)
+    rng = np.random.default_rng(seed)
+
+    conditions = [
+        ("☀️ Clear", "Clear"),
+        ("🌤️ Partly Cloudy", "Partly Cloudy"),
+        ("☁️ Overcast", "Overcast"),
+        ("🌧️ Light Rain", "Light Rain"),
+        ("⛈️ Thunderstorm", "Thunderstorm"),
+        ("🌫️ Foggy", "Foggy"),
+    ]
+    condition_label, condition_key = conditions[rng.integers(0, len(conditions))]
+
+    return {
+        "temperature_c": round(float(rng.uniform(12, 33)), 1),
+        "humidity_pct": int(rng.integers(35, 92)),
+        "wind_speed_kph": round(float(rng.uniform(2, 28)), 1),
+        "condition_label": condition_label,
+        "condition_key": condition_key,
+    }
+
+
+# ─────────────────────────────────────────────
+# BUSINESS LOGIC — WEATHER SUITABILITY
+# ─────────────────────────────────────────────
+def evaluate_weather(weather: dict, difficulty: str) -> tuple[str, str, int]:
+    """
+    Produces a runability score (0–100) and human-readable recommendation
+    based on weather conditions and course difficulty.
+
+    Args:
+        weather:    Dict returned by get_mock_weather().
+        difficulty: 'Beginner', 'Intermediate', or 'Advanced'.
+
+    Returns:
+        (status_emoji, recommendation_text, runability_score)
+    """
+    score = 100
+    notes = []
+
+    temp = weather["temperature_c"]
+    humidity = weather["humidity_pct"]
+    wind = weather["wind_speed_kph"]
+    condition = weather["condition_key"]
+
+    # ── Temperature penalties ──
+    if temp > 30:
+        penalty = int((temp - 30) * 5)
+        score -= penalty
+        notes.append(f"High heat ({temp}°C) — hydrate frequently and consider early-morning start.")
+    elif temp > 26:
+        score -= 10
+        notes.append(f"Warm conditions ({temp}°C) — carry extra water.")
+    elif temp < 5:
+        score -= 15
+        notes.append(f"Cold temperature ({temp}°C) — layer up and warm up thoroughly.")
+
+    # ── Humidity penalties ──
+    if humidity > 80:
+        score -= 15
+        notes.append(f"High humidity ({humidity}%) increases perceived effort.")
+    elif humidity > 70:
+        score -= 5
+
+    # ── Wind penalties ──
+    if wind > 20:
+        score -= 20
+        notes.append(f"Strong wind ({wind} km/h) — exposed ridge trails not advised.")
+    elif wind > 12:
+        score -= 8
+        notes.append(f"Moderate wind ({wind} km/h) — minor impact on pace.")
+
+    # ── Condition penalties ──
+    if condition == "Light Rain":
+        score -= 15
+        notes.append("Light rain — trails may be slippery; stick to paved surfaces.")
+    elif condition == "Thunderstorm":
+        score -= 60
+        notes.append("⚠️ Thunderstorm active — outdoor running strongly discouraged.")
+    elif condition == "Foggy":
+        score -= 10
+        notes.append("Fog reduces visibility on trails — run familiar, well-marked routes only.")
+
+    # ── Extra difficulty penalty on bad weather ──
+    if difficulty == "Advanced" and score < 70:
+        score -= 10
+        notes.append("Advanced terrain amplifies weather risks — consider rescheduling.")
+
+    score = max(0, min(100, score))
+
+    if score >= 80:
+        status = "✅ Great conditions"
+    elif score >= 55:
+        status = "⚠️ Runnable with caution"
+    else:
+        status = "❌ Not recommended"
+
+    recommendation = " ".join(notes) if notes else "Conditions look excellent — enjoy your run!"
+    return status, recommendation, score
+
+
+# ─────────────────────────────────────────────
+# HELPER — COLOUR BY DIFFICULTY
+# ─────────────────────────────────────────────
+DIFFICULTY_COLOURS = {
+    "Beginner": "#22c55e",      # green
+    "Intermediate": "#f59e0b",  # amber
+    "Advanced": "#ef4444",      # red
+}
+
+SURFACE_ICONS = {
+    "Asphalt": "🛣️",
+    "Cycle Path": "🚴",
+    "Dirt Trail": "🌿",
+    "Rock": "🪨",
+    "Paved Road": "🛤️",
+    "Urethane Track": "🏟️",
+    "Wooden Boardwalk": "🪵",
+    "Concrete": "🏙️",
+    "Stone": "🪨",
+}
+
+
+def surface_icon(surface_str: str) -> str:
+    """Returns an emoji icon for the dominant surface type."""
+    for key, icon in SURFACE_ICONS.items():
+        if key.lower() in surface_str.lower():
+            return icon
+    return "👟"
+
+
+# ─────────────────────────────────────────────
+# CUSTOM CSS  (minimal, purposeful)
+# ─────────────────────────────────────────────
+st.markdown(
+    """
+    <style>
+    /* Card-style containers */
+    .course-card {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
+        color: #f1f5f9;
+    }
+    .course-card h4 { margin: 0 0 0.3rem 0; font-size: 1.05rem; }
+    .course-card p  { margin: 0; font-size: 0.88rem; color: #94a3b8; line-height: 1.5; }
+
+    /* Difficulty badge */
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Runability bar */
+    .run-bar-outer {
+        background: #1e293b;
+        border-radius: 8px;
+        height: 14px;
+        width: 100%;
+        margin-top: 6px;
+    }
+    .run-bar-inner {
+        height: 14px;
+        border-radius: 8px;
+        transition: width 0.4s ease;
+    }
+
+    /* Tweak sidebar padding */
+    section[data-testid="stSidebar"] > div:first-child { padding-top: 1.5rem; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# ─────────────────────────────────────────────
+# MAIN APP
+# ─────────────────────────────────────────────
+def main():
+    # ── Load data ──────────────────────────────────────────────────────────────
+    df_courses = load_course_data()
+
+    # ─────────────────────────────────────────
+    # SIDEBAR
+    # ─────────────────────────────────────────
+    with st.sidebar:
+        st.image(
+            "https://img.icons8.com/fluency/96/running.png",
+            width=56,
+        )
+        st.title("Course Filters")
+        st.divider()
+
+        # Difficulty filter
+        selected_difficulties = st.multiselect(
+            "Difficulty Level",
+            options=["Beginner", "Intermediate", "Advanced"],
+            default=["Beginner", "Intermediate", "Advanced"],
+            help="Filter courses by difficulty before selecting.",
+        )
+
+        # Apply filter to available courses
+        filtered_df = df_courses[df_courses["difficulty"].isin(selected_difficulties)]
+
+        if filtered_df.empty:
+            st.warning("No courses match the selected difficulty levels.")
+            st.stop()
+
+        # Course selector
+        selected_course_name = st.selectbox(
+            "Select a Course",
+            options=filtered_df["name"].tolist(),
+        )
+
+        st.divider()
+        st.caption("📍 Mock weather is regenerated hourly to simulate live data.")
+        st.caption("🗂️ Source: Curated mock dataset — Seoul running routes.")
+
+    # ── Retrieve selected course row ───────────────────────────────────────────
+    course = filtered_df[filtered_df["name"] == selected_course_name].iloc[0]
+
+    # ─────────────────────────────────────────
+    # HEADER
+    # ─────────────────────────────────────────
+    col_title, col_badge = st.columns([5, 1])
+    with col_title:
+        st.title("🏃 Running Course Analyzer")
+        st.markdown(
+            "Explore Seoul's best routes — terrain breakdowns, live-style weather "
+            "suitability checks, and elevation profiles at a glance."
+        )
+    with col_badge:
+        diff_colour = DIFFICULTY_COLOURS[course["difficulty"]]
+        st.markdown(
+            f"""
+            <div style='text-align:right; padding-top:1.2rem;'>
+                <span class='badge' style='background:{diff_colour}22;
+                      color:{diff_colour}; border:1px solid {diff_colour}55;'>
+                    {course['difficulty'].upper()}
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # COURSE DESCRIPTION CARD
+    # ─────────────────────────────────────────
+    surface_em = surface_icon(course["surface"])
+    st.markdown(
+        f"""
+        <div class='course-card'>
+            <h4>{surface_em} {course['name']}</h4>
+            <p>📍 {course['location']} &nbsp;|&nbsp; 🛤️ {course['surface']}</p>
+            <p style='margin-top:0.5rem;'>{course['description']}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # ─────────────────────────────────────────
+    # KEY METRICS
+    # ─────────────────────────────────────────
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("📏 Distance", f"{course['distance_km']} km")
+    m2.metric("⛰️ Elevation Gain", f"{course['elevation_gain_m']} m")
+    m3.metric("⏱️ Est. Time", f"{course['avg_time_min']} min")
+
+    # Pace derived from distance and estimated time
+    pace_min_km = course["avg_time_min"] / course["distance_km"]
+    pace_str = f"{int(pace_min_km)}:{int((pace_min_km % 1) * 60):02d} /km"
+    m4.metric("🏃 Avg Pace", pace_str)
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # TWO-COLUMN LAYOUT: Elevation + Weather
+    # ─────────────────────────────────────────
+    col_chart, col_weather = st.columns([3, 2], gap="large")
+
+    # ── Elevation Profile ──────────────────────────────────────────────────────
+    with col_chart:
+        st.subheader("📈 Elevation Profile")
+
+        elev_df = generate_elevation_profile(
+            course["name"], course["distance_km"], course["elevation_gain_m"]
+        )
+
+        # Build a filled area chart with Plotly for better aesthetics than st.line_chart
+        fig = go.Figure()
+
+        # Shaded area under the curve
+        fig.add_trace(
+            go.Scatter(
+                x=elev_df["distance_km"],
+                y=elev_df["elevation_m"],
+                mode="lines",
+                fill="tozeroy",
+                line=dict(color="#38bdf8", width=2.5),
+                fillcolor="rgba(56,189,248,0.15)",
+                name="Elevation",
+                hovertemplate="<b>Distance:</b> %{x:.2f} km<br><b>Elevation:</b> %{y:.0f} m<extra></extra>",
+            )
+        )
+
+        fig.update_layout(
+            margin=dict(l=0, r=0, t=10, b=0),
+            height=280,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(
+                title="Distance (km)",
+                showgrid=True,
+                gridcolor="#1e293b",
+                color="#94a3b8",
+            ),
+            yaxis=dict(
+                title="Elevation (m)",
+                showgrid=True,
+                gridcolor="#1e293b",
+                color="#94a3b8",
+            ),
+            showlegend=False,
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Mini terrain stats below the chart
+        t1, t2, t3 = st.columns(3)
+        t1.markdown(f"**Min Elev.** {elev_df['elevation_m'].min():.0f} m")
+        t2.markdown(f"**Max Elev.** {elev_df['elevation_m'].max():.0f} m")
+        t3.markdown(
+            f"**Gain** {course['elevation_gain_m']} m "
+            f"({course['elevation_gain_m'] / course['distance_km']:.0f} m/km)"
+        )
+
+    # ── Weather Panel ──────────────────────────────────────────────────────────
+    with col_weather:
+        st.subheader("🌤️ Current Weather")
+
+        weather = get_mock_weather(course["location"])
+        status, recommendation, run_score = evaluate_weather(weather, course["difficulty"])
+
+        # Weather stats
+        w1, w2 = st.columns(2)
+        w1.metric("🌡️ Temperature", f"{weather['temperature_c']}°C")
+        w2.metric("💧 Humidity", f"{weather['humidity_pct']}%")
+        w3, w4 = st.columns(2)
+        w3.metric("💨 Wind", f"{weather['wind_speed_kph']} km/h")
+        w4.metric("Sky", weather["condition_label"])
+
+        st.divider()
+
+        # Runability score with colour-coded bar
+        if run_score >= 80:
+            bar_color = "#22c55e"
+        elif run_score >= 55:
+            bar_color = "#f59e0b"
+        else:
+            bar_color = "#ef4444"
+
+        st.markdown(f"**Runability Score** — {status}")
+        st.markdown(
+            f"""
+            <div class='run-bar-outer'>
+                <div class='run-bar-inner'
+                     style='width:{run_score}%; background:{bar_color};'></div>
+            </div>
+            <p style='font-size:0.78rem; color:#94a3b8; margin-top:4px;'>{run_score}/100</p>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # Recommendation note
+        with st.expander("💬 Detailed Recommendation", expanded=run_score < 80):
+            st.write(recommendation)
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # COURSE COMPARISON TABLE
+    # ─────────────────────────────────────────
+    with st.expander("📊 Compare All Courses", expanded=False):
+        st.markdown("All courses in the current difficulty filter, sorted by distance.")
+
+        display_df = filtered_df[
+            ["name", "difficulty", "distance_km", "elevation_gain_m", "surface", "avg_time_min"]
+        ].copy()
+        display_df.columns = ["Course", "Difficulty", "Distance (km)", "Elevation Gain (m)", "Surface", "Time (min)"]
+        display_df = display_df.sort_values("Distance (km)").reset_index(drop=True)
+
+        # Colour the difficulty column via a pandas Styler
+        def colour_difficulty(val):
+            colour = DIFFICULTY_COLOURS.get(val, "#888")
+            return f"color: {colour}; font-weight: 700;"
+
+        styled = display_df.style.applymap(colour_difficulty, subset=["Difficulty"])
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+
+    # ─────────────────────────────────────────
+    # ELEVATION COMPARISON (all filtered courses)
+    # ─────────────────────────────────────────
+    with st.expander("⛰️ Elevation Gain Comparison", expanded=False):
+        st.markdown("Stacked bar comparing distance vs. elevation gain across filtered courses.")
+
+        bar_df = filtered_df[["name", "distance_km", "elevation_gain_m"]].copy()
+        bar_df["name_short"] = bar_df["name"].apply(lambda x: x.split(" ")[0:3])
+        bar_df["name_short"] = bar_df["name_short"].apply(lambda x: " ".join(x))
+
+        fig2 = go.Figure()
+        fig2.add_trace(
+            go.Bar(
+                x=bar_df["name_short"],
+                y=bar_df["distance_km"],
+                name="Distance (km)",
+                marker_color="#38bdf8",
+            )
+        )
+        fig2.add_trace(
+            go.Bar(
+                x=bar_df["name_short"],
+                y=bar_df["elevation_gain_m"] / 100,  # Scale to km for visual comparison
+                name="Elevation Gain (×100 m)",
+                marker_color="#f59e0b",
+            )
+        )
+        fig2.update_layout(
+            barmode="group",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            height=300,
+            margin=dict(l=0, r=0, t=10, b=0),
+            xaxis=dict(color="#94a3b8"),
+            yaxis=dict(color="#94a3b8", gridcolor="#1e293b"),
+            legend=dict(orientation="h", y=1.12),
+        )
+        st.plotly_chart(fig2, use_container_width=True)
+
+    # ─────────────────────────────────────────
+    # FOOTER
+    # ─────────────────────────────────────────
+    st.markdown(
+        "<p style='text-align:center; color:#475569; font-size:0.8rem; margin-top:2rem;'>"
+        "Running Course Analyzer · Built with Streamlit · Data is illustrative only"
+        "</p>",
+        unsafe_allow_html=True,
+    )
+
+
+# ─────────────────────────────────────────────
+# ENTRY POINT
+# ─────────────────────────────────────────────
+if __name__ == "__main__":
+    main()
