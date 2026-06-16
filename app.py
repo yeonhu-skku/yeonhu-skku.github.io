@@ -124,7 +124,8 @@ def add_run_history(username, course_name, distance):
 
 def get_run_history(username):
     conn = sqlite3.connect(DB_FILE)
-    df = pd.read_sql_query("SELECT course_name, distance, run_date FROM run_history WHERE username = ? ORDER BY run_date DESC", conn)
+    query = "SELECT course_name, distance, run_date FROM run_history WHERE username = ? ORDER BY run_date DESC"
+    df = pd.read_sql_query(query, conn, params=(username,))
     conn.close()
     return df
 
