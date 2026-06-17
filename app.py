@@ -27,109 +27,41 @@ st.set_page_config(
 )
 
 # ─────────────────────────────────────────────
-# MOCK DATA — COURSES
+# COURSE DATA — loaded from data/courses.csv
 # ─────────────────────────────────────────────
 @st.cache_data
 def load_course_data() -> pd.DataFrame:
     """
-    Returns a DataFrame of predefined running courses with metadata.
-    Uses @st.cache_data so it is computed only once per session.
+    Loads the running course dataset from data/courses.csv.
+    Uses @st.cache_data so the file is read only once per session.
+
+    The CSV includes per-course metadata (distance, elevation gain,
+    surface, difficulty) plus latitude/longitude and a semicolon-separated
+    waypoints string used to render each course on the interactive map.
+
+    Returns:
+        A DataFrame with one row per course.
     """
-    courses = [
-        {
-            "name": "Han River Riverside Path",
-            "location": "Seoul, Yeouido",
-            "distance_km": 7.2,
-            "elevation_gain_m": 18,
-            "surface": "Asphalt / Cycle Path",
-            "difficulty": "Beginner",
-            "avg_time_min": 43,
-            "description": (
-                "A flat, scenic loop along the Han River. "
-                "Perfect for beginners or easy recovery runs. "
-                "Well-lit and open year-round."
-            ),
-        },
-        {
-            "name": "Bukhansan Forest Trail",
-            "location": "Seoul, Dobonggu",
-            "distance_km": 12.5,
-            "elevation_gain_m": 680,
-            "surface": "Dirt Trail / Rock",
-            "difficulty": "Advanced",
-            "avg_time_min": 110,
-            "description": (
-                "A challenging mountain trail inside Bukhansan National Park. "
-                "Technical rocky sections demand trail shoes and careful footing."
-            ),
-        },
-        {
-            "name": "Namsan Circular Loop",
-            "location": "Seoul, Yongsan",
-            "distance_km": 5.8,
-            "elevation_gain_m": 195,
-            "surface": "Paved Road / Dirt",
-            "difficulty": "Intermediate",
-            "avg_time_min": 52,
-            "description": (
-                "A popular loop circumnavigating Namsan (N Seoul Tower). "
-                "Moderate climb with panoramic city views at the summit."
-            ),
-        },
-        {
-            "name": "Olympic Park Track",
-            "location": "Seoul, Songpa",
-            "distance_km": 3.0,
-            "elevation_gain_m": 5,
-            "surface": "Urethane Track",
-            "difficulty": "Beginner",
-            "avg_time_min": 18,
-            "description": (
-                "A smooth 400 m urethane track inside Olympic Park. "
-                "Ideal for interval training and easy on the joints."
-            ),
-        },
-        {
-            "name": "Achasan Ridge Run",
-            "location": "Seoul, Gwangjin",
-            "distance_km": 8.9,
-            "elevation_gain_m": 320,
-            "surface": "Dirt Trail / Wooden Boardwalk",
-            "difficulty": "Intermediate",
-            "avg_time_min": 75,
-            "description": (
-                "A scenic ridge trail in eastern Seoul with city skyline views. "
-                "Wooden boardwalks on steeper sections keep the descent manageable."
-            ),
-        },
-        {
-            "name": "Cheonggyecheon Streamside Path",
-            "location": "Seoul, Jongno",
-            "distance_km": 5.4,
-            "elevation_gain_m": 8,
-            "surface": "Concrete / Stone",
-            "difficulty": "Beginner",
-            "avg_time_min": 32,
-            "description": (
-                "A cool, shaded urban run along the restored Cheonggyecheon Stream. "
-                "Flat and refreshing — ideal for hot summer days."
-            ),
-        },
-        {
-            "name": "Dobongsan Summit Push",
-            "location": "Seoul, Dobong",
-            "distance_km": 15.3,
-            "elevation_gain_m": 890,
-            "surface": "Rock / Dirt Trail",
-            "difficulty": "Advanced",
-            "avg_time_min": 145,
-            "description": (
-                "One of the toughest routes in Seoul, ascending to Dobongsan's "
-                "granite peaks. Serious scrambling required near the top."
-            ),
-        },
-    ]
-    return pd.DataFrame(courses)
+    df = pd.read_csv("data/courses.csv")
+    return df
+
+
+def parse_waypoints(waypoints_str: str) -> pd.DataFrame:
+    """
+    Parses the semicolon-separated 'lat,lon;lat,lon;...' waypoints string
+    stored in the CSV into a DataFrame ready for map plotting.
+
+    Args:
+        waypoints_str: e.g. "37.5285,126.9326;37.5295,126.9280;..."
+
+    Returns:
+        A DataFrame with columns ['lat', 'lon'] in path order.
+    """
+    points = []
+    for pair in waypoints_str.split(";"):
+        lat_str, lon_str = pair.split(",")
+        points.append({"lat": float(lat_str), "lon": float(lon_str)})
+    return pd.DataFrame(points)
 
 
 # ─────────────────────────────────────────────
@@ -207,6 +139,78 @@ def get_mock_weather(location: str) -> dict:
         "condition_label": condition_label,
         "condition_key": condition_key,
     }
+
+
+# ─────────────────────────────────────────────
+# MAP BUILDER — course route on an interactive OpenStreetMap
+# ─────────────────────────────────────────────
+def build_course_map(course: pd.Series) -> go.Figure:
+    """
+    Builds an interactive Plotly map showing the course route plotted over
+    real OpenStreetMap tiles (via Plotly's built-in 'open-street-map' style,
+    which requires no API key or Mapbox token).
+
+    Args:
+        course: A single row (Series) from the courses DataFrame, including
+                 'latitude', 'longitude', and 'waypoints'.
+
+    Returns:
+        A Plotly Figure with the route line and start/finish markers.
+    """
+    path_df = parse_waypoints(course["waypoints"])
+
+    fig = go.Figure()
+
+    # Route line
+    fig.add_trace(
+        go.Scattermapbox(
+            lat=path_df["lat"],
+            lon=path_df["lon"],
+            mode="lines+markers",
+            line=dict(width=4, color="#38bdf8"),
+            marker=dict(size=6, color="#38bdf8"),
+            hovertemplate="Lat: %{lat:.4f}<br>Lon: %{lon:.4f}<extra></extra>",
+            name="Route",
+        )
+    )
+
+    # Start marker
+    fig.add_trace(
+        go.Scattermapbox(
+            lat=[path_df["lat"].iloc[0]],
+            lon=[path_df["lon"].iloc[0]],
+            mode="markers",
+            marker=dict(size=14, color="#22c55e"),
+            hovertemplate="🏁 Start<extra></extra>",
+            name="Start",
+        )
+    )
+
+    # Finish marker (last waypoint; same as start for loop courses)
+    fig.add_trace(
+        go.Scattermapbox(
+            lat=[path_df["lat"].iloc[-1]],
+            lon=[path_df["lon"].iloc[-1]],
+            mode="markers",
+            marker=dict(size=14, color="#ef4444"),
+            hovertemplate="🏁 Finish<extra></extra>",
+            name="Finish",
+        )
+    )
+
+    fig.update_layout(
+        mapbox=dict(
+            style="open-street-map",  # Free tile layer, no token required
+            center=dict(lat=path_df["lat"].mean(), lon=path_df["lon"].mean()),
+            zoom=13,
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=380,
+        showlegend=False,
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+
+    return fig
 
 
 # ─────────────────────────────────────────────
@@ -611,6 +615,18 @@ def main():
         # Recommendation note
         with st.expander("💬 Detailed Recommendation", expanded=run_score < 80):
             st.write(recommendation)
+
+    st.divider()
+
+    # ─────────────────────────────────────────
+    # COURSE MAP
+    # ─────────────────────────────────────────
+    st.subheader("📍 Course Map")
+    st.caption(
+        "Route plotted on real OpenStreetMap tiles — green marks the start, red marks the finish."
+    )
+    map_fig = build_course_map(course)
+    st.plotly_chart(map_fig, use_container_width=True)
 
     st.divider()
 
