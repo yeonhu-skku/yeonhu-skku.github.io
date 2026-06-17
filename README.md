@@ -68,6 +68,19 @@ An earlier version of this project attempted to integrate the OpenWeatherMap API
 
 ---
 
+## Updates After Presentation
+
+The following changes were made after the in-class presentation, in response to instructor feedback requesting a more visual map feature, and to clean up the project structure for submission:
+
+- **Added an interactive course map.** Each course now renders its route on real OpenStreetMap tiles (via Plotly's `Scattermapbox`), with green/red markers for start and finish. This was added directly in response to feedback that the project needed a more visual, geographic representation of each course.
+- **Separated the dataset from the application code.** Course data was moved from a hardcoded Python list inside `app.py` into a standalone `data/courses.csv` file, with added `latitude`, `longitude`, and `waypoints` columns to support the new map feature.
+- **Fixed a deployment path bug.** The CSV was originally loaded with a relative path (`"data/courses.csv"`), which failed on Streamlit Cloud with a `FileNotFoundError` depending on the app's working directory. This was fixed by resolving the path relative to `app.py`'s own location using `os.path.dirname(os.path.abspath(__file__))`.
+- **Removed placeholder sidebar captions** that referenced the dataset as a generic mock dataset, since the data sourcing process is now documented in detail in this README instead.
+
+The presentation slides (`running_course_analyzer_presentation.pptx`) reflect the app's state at the time of presentation and were not modified after the fact; the live app and code in this repository reflect the most current, final version.
+
+---
+
 ## Possible Future Improvements
 
 - Replace simulated weather with a live API call when deployed outside Streamlit Cloud's free-tier network restrictions
